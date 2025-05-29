@@ -158,10 +158,11 @@ export default {
 <style rel="stylesheet/scss" lang="scss">
 .login {
   display: flex;
-  justify-content: center;
+  justify-content: flex-end; // 修改为水平靠右对齐
   align-items: center;
+  //position: relative;
   height: 100%;
-  background-image: url("../assets/images/login-background.jpg");
+  background-image: url("../assets/images/login-background (2).jpg");
   background-size: cover;
 }
 .title {
@@ -171,6 +172,13 @@ export default {
 }
 
 .login-form {
+  position: absolute;
+  /* 距离顶部 20% */
+  top: 40%;
+  /* 距离右侧 10% */
+  right: 15%;
+
+
   border-radius: 6px;
   background: #ffffff;
   width: 400px;
@@ -213,7 +221,7 @@ export default {
   font-size: 12px;
   letter-spacing: 1px;
 }
-.login-code-img {
-  height: 38px;
+.login-code-img { // 验证码图片
+  height: 48px;
 }
 </style>
