@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysMaterialStampingMapper">
+    
+    <resultMap type="SysMaterialStamping" id="SysMaterialStampingResult">
+        <result property="id"    column="id"    />
+        <result property="materialId"    column="material_id"    />
+        <result property="materialName"    column="material_name"    />
+        <result property="supplierId"    column="supplier_id"    />
+        <result property="supplierName"    column="supplier_name"    />
+        <result property="num"    column="num"    />
+        <result property="price"    column="price"    />
+        <result property="entryTime"    column="entry_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectSysMaterialStampingVo">
+        select id, material_id, material_name, supplier_id, supplier_name, num, price, entry_time, remark from sys_material_stamping
+    </sql>
+
+    <select id="selectSysMaterialStampingList" parameterType="SysMaterialStamping" resultMap="SysMaterialStampingResult">
+        <include refid="selectSysMaterialStampingVo"/>
+        <where>  
+            <if test="materialId != null "> and material_id = #{materialId}</if>
+            <if test="materialName != null  and materialName != ''"> and material_name like concat('%', #{materialName}, '%')</if>
+            <if test="supplierId != null "> and supplier_id = #{supplierId}</if>
+            <if test="supplierName != null  and supplierName != ''"> and supplier_name like concat('%', #{supplierName}, '%')</if>
+            <if test="num != null "> and num = #{num}</if>
+            <if test="price != null "> and price = #{price}</if>
+            <if test="entryTime != null "> and entry_time = #{entryTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysMaterialStampingById" parameterType="Long" resultMap="SysMaterialStampingResult">
+        <include refid="selectSysMaterialStampingVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertSysMaterialStamping" parameterType="SysMaterialStamping" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_material_stamping
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="materialId != null">material_id,</if>
+            <if test="materialName != null">material_name,</if>
+            <if test="supplierId != null">supplier_id,</if>
+            <if test="supplierName != null">supplier_name,</if>
+            <if test="num != null">num,</if>
+            <if test="price != null">price,</if>
+            <if test="entryTime != null">entry_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="materialId != null">#{materialId},</if>
+            <if test="materialName != null">#{materialName},</if>
+            <if test="supplierId != null">#{supplierId},</if>
+            <if test="supplierName != null">#{supplierName},</if>
+            <if test="num != null">#{num},</if>
+            <if test="price != null">#{price},</if>
+            <if test="entryTime != null">#{entryTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysMaterialStamping" parameterType="SysMaterialStamping">
+        update sys_material_stamping
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="materialId != null">material_id = #{materialId},</if>
+            <if test="materialName != null">material_name = #{materialName},</if>
+            <if test="supplierId != null">supplier_id = #{supplierId},</if>
+            <if test="supplierName != null">supplier_name = #{supplierName},</if>
+            <if test="num != null">num = #{num},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="entryTime != null">entry_time = #{entryTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysMaterialStampingById" parameterType="Long">
+        delete from sys_material_stamping where id = #{id}
+    </delete>
+
+    <delete id="deleteSysMaterialStampingByIds" parameterType="String">
+        delete from sys_material_stamping where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

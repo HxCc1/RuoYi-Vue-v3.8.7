@@ -1,7 +1,10 @@
 <template>
   <div class="app-container">
+<!-- 行布局组件，用于水平排列子元素-->
     <el-row :gutter="20">
+<!--  列布局组件，用于在 <el-row> 中划分列，实现栅格布局 -->
       <el-col :span="6" :xs="24">
+<!--    卡片组件，用于展示信息  -->
         <el-card class="box-card">
           <div slot="header" class="clearfix">
             <span>个人信息</span>
