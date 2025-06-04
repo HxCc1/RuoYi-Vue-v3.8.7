@@ -42,3 +42,15 @@ export function delStamping(id) {
     method: 'delete'
   })
 }
+
+// 导入冲压库存数据
+export function importStamping(data) {
+  return request({
+    url: '/system/stamping/importData',
+    method: 'post',
+    data: data,
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
+}

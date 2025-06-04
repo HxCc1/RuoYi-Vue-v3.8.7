@@ -4,14 +4,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
@@ -22,10 +16,10 @@ import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
 
 /**
- * 冲压库存管理Controller
- * 
+ * 冲压件库存管理Controller
+ *
  * @author ruoyi
- * @date 2025-06-03
+ * @date 2025-06-04
  */
 @RestController
 @RequestMapping("/system/stamping")
@@ -35,7 +29,7 @@ public class SysMaterialStampingController extends BaseController
     private ISysMaterialStampingService sysMaterialStampingService;
 
     /**
-     * 查询冲压库存管理列表
+     * 查询冲压件库存管理列表
      */
     @PreAuthorize("@ss.hasPermi('system:stamping:list')")
     @GetMapping("/list")
@@ -47,20 +41,20 @@ public class SysMaterialStampingController extends BaseController
     }
 
     /**
-     * 导出冲压库存管理列表
+     * 导出冲压件库存管理列表
      */
     @PreAuthorize("@ss.hasPermi('system:stamping:export')")
-    @Log(title = "冲压库存管理", businessType = BusinessType.EXPORT)
+    @Log(title = "冲压件库存管理", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(HttpServletResponse response, SysMaterialStamping sysMaterialStamping)
     {
         List<SysMaterialStamping> list = sysMaterialStampingService.selectSysMaterialStampingList(sysMaterialStamping);
         ExcelUtil<SysMaterialStamping> util = new ExcelUtil<SysMaterialStamping>(SysMaterialStamping.class);
-        util.exportExcel(response, list, "冲压库存管理数据");
+        util.exportExcel(response, list, "冲压件库存管理数据");
     }
 
     /**
-     * 获取冲压库存管理详细信息
+     * 获取冲压件库存管理详细信息
      */
     @PreAuthorize("@ss.hasPermi('system:stamping:query')")
     @GetMapping(value = "/{id}")
@@ -70,10 +64,10 @@ public class SysMaterialStampingController extends BaseController
     }
 
     /**
-     * 新增冲压库存管理
+     * 新增冲压件库存管理
      */
     @PreAuthorize("@ss.hasPermi('system:stamping:add')")
-    @Log(title = "冲压库存管理", businessType = BusinessType.INSERT)
+    @Log(title = "冲压件库存管理", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody SysMaterialStamping sysMaterialStamping)
     {
@@ -81,10 +75,10 @@ public class SysMaterialStampingController extends BaseController
     }
 
     /**
-     * 修改冲压库存管理
+     * 修改冲压件库存管理
      */
     @PreAuthorize("@ss.hasPermi('system:stamping:edit')")
-    @Log(title = "冲压库存管理", businessType = BusinessType.UPDATE)
+    @Log(title = "冲压件库存管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody SysMaterialStamping sysMaterialStamping)
     {
@@ -92,13 +86,35 @@ public class SysMaterialStampingController extends BaseController
     }
 
     /**
-     * 删除冲压库存管理
+     * 删除冲压件库存管理
      */
     @PreAuthorize("@ss.hasPermi('system:stamping:remove')")
-    @Log(title = "冲压库存管理", businessType = BusinessType.DELETE)
-	@DeleteMapping("/{ids}")
+    @Log(title = "冲压件库存管理", businessType = BusinessType.DELETE)
+    @DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids)
     {
         return toAjax(sysMaterialStampingService.deleteSysMaterialStampingByIds(ids));
+    }
+
+    /**
+     * 导入冲压库存管理数据
+     */
+    @PreAuthorize("@ss.hasPermi('system:stamping:import')")
+    @Log(title = "冲压库存管理", businessType = BusinessType.IMPORT)
+    @PostMapping("/importData")
+    public AjaxResult importData(@RequestParam("file") MultipartFile file, boolean updateSupport) throws Exception
+    {
+        ExcelUtil<SysMaterialStamping> util = new ExcelUtil<SysMaterialStamping>(SysMaterialStamping.class);
+        List<SysMaterialStamping> stampingList = util.importExcel(file.getInputStream());
+        String operName = getUsername();
+        String message = sysMaterialStampingService.importStamping(stampingList, updateSupport, operName);
+        return success(message);
+    }
+
+    @PostMapping("/importTemplate")
+    public void importTemplate(HttpServletResponse response)
+    {
+        ExcelUtil<SysMaterialStamping> util = new ExcelUtil<SysMaterialStamping>(SysMaterialStamping.class);
+        util.importTemplateExcel(response, "物料数据");
     }
 }

@@ -1,6 +1,5 @@
 package com.ruoyi.system.domain;
 
-import java.math.BigDecimal;
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -9,10 +8,10 @@ import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.core.domain.BaseEntity;
 
 /**
- * 冲压库存管理对象 sys_material_stamping
- * 
+ * 冲压件库存管理对象 sys_material_stamping
+ *
  * @author ruoyi
- * @date 2025-06-03
+ * @date 2025-06-04
  */
 public class SysMaterialStamping extends BaseEntity
 {
@@ -41,84 +40,71 @@ public class SysMaterialStamping extends BaseEntity
     @Excel(name = "物料数量")
     private Long num;
 
-    /** 物料价格 */
-    @Excel(name = "物料价格")
-    private BigDecimal price;
-
     /** 物料入库时间 */
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Excel(name = "物料入库时间", width = 30, dateFormat = "yyyy-MM-dd")
     private Date entryTime;
 
-    public void setId(Long id) 
+    public void setId(Long id)
     {
         this.id = id;
     }
 
-    public Long getId() 
+    public Long getId()
     {
         return id;
     }
-    public void setMaterialId(Long materialId) 
+    public void setMaterialId(Long materialId)
     {
         this.materialId = materialId;
     }
 
-    public Long getMaterialId() 
+    public Long getMaterialId()
     {
         return materialId;
     }
-    public void setMaterialName(String materialName) 
+    public void setMaterialName(String materialName)
     {
         this.materialName = materialName;
     }
 
-    public String getMaterialName() 
+    public String getMaterialName()
     {
         return materialName;
     }
-    public void setSupplierId(Long supplierId) 
+    public void setSupplierId(Long supplierId)
     {
         this.supplierId = supplierId;
     }
 
-    public Long getSupplierId() 
+    public Long getSupplierId()
     {
         return supplierId;
     }
-    public void setSupplierName(String supplierName) 
+    public void setSupplierName(String supplierName)
     {
         this.supplierName = supplierName;
     }
 
-    public String getSupplierName() 
+    public String getSupplierName()
     {
         return supplierName;
     }
-    public void setNum(Long num) 
+    public void setNum(Long num)
     {
         this.num = num;
     }
 
-    public Long getNum() 
+    public Long getNum()
     {
         return num;
     }
-    public void setPrice(BigDecimal price) 
-    {
-        this.price = price;
-    }
-
-    public BigDecimal getPrice() 
-    {
-        return price;
-    }
-    public void setEntryTime(Date entryTime) 
+    public void setEntryTime(Date entryTime)
     {
         this.entryTime = entryTime;
     }
 
-    public Date getEntryTime() 
+    public Date getEntryTime()
     {
         return entryTime;
     }
@@ -126,15 +112,14 @@ public class SysMaterialStamping extends BaseEntity
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("id", getId())
-            .append("materialId", getMaterialId())
-            .append("materialName", getMaterialName())
-            .append("supplierId", getSupplierId())
-            .append("supplierName", getSupplierName())
-            .append("num", getNum())
-            .append("price", getPrice())
-            .append("entryTime", getEntryTime())
-            .append("remark", getRemark())
-            .toString();
+                .append("id", getId())
+                .append("materialId", getMaterialId())
+                .append("materialName", getMaterialName())
+                .append("supplierId", getSupplierId())
+                .append("supplierName", getSupplierName())
+                .append("num", getNum())
+                .append("entryTime", getEntryTime())
+                .append("remark", getRemark())
+                .toString();
     }
 }

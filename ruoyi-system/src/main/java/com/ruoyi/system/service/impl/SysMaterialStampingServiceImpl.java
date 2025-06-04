@@ -8,22 +8,22 @@ import com.ruoyi.system.domain.SysMaterialStamping;
 import com.ruoyi.system.service.ISysMaterialStampingService;
 
 /**
- * 冲压库存管理Service业务层处理
- * 
+ * 冲压件库存管理Service业务层处理
+ *
  * @author ruoyi
- * @date 2025-06-03
+ * @date 2025-06-04
  */
 @Service
-public class SysMaterialStampingServiceImpl implements ISysMaterialStampingService 
+public class SysMaterialStampingServiceImpl implements ISysMaterialStampingService
 {
     @Autowired
     private SysMaterialStampingMapper sysMaterialStampingMapper;
 
     /**
-     * 查询冲压库存管理
-     * 
-     * @param id 冲压库存管理主键
-     * @return 冲压库存管理
+     * 查询冲压件库存管理
+     *
+     * @param id 冲压件库存管理主键
+     * @return 冲压件库存管理
      */
     @Override
     public SysMaterialStamping selectSysMaterialStampingById(Long id)
@@ -32,10 +32,10 @@ public class SysMaterialStampingServiceImpl implements ISysMaterialStampingServi
     }
 
     /**
-     * 查询冲压库存管理列表
-     * 
-     * @param sysMaterialStamping 冲压库存管理
-     * @return 冲压库存管理
+     * 查询冲压件库存管理列表
+     *
+     * @param sysMaterialStamping 冲压件库存管理
+     * @return 冲压件库存管理
      */
     @Override
     public List<SysMaterialStamping> selectSysMaterialStampingList(SysMaterialStamping sysMaterialStamping)
@@ -44,9 +44,9 @@ public class SysMaterialStampingServiceImpl implements ISysMaterialStampingServi
     }
 
     /**
-     * 新增冲压库存管理
-     * 
-     * @param sysMaterialStamping 冲压库存管理
+     * 新增冲压件库存管理
+     *
+     * @param sysMaterialStamping 冲压件库存管理
      * @return 结果
      */
     @Override
@@ -56,9 +56,9 @@ public class SysMaterialStampingServiceImpl implements ISysMaterialStampingServi
     }
 
     /**
-     * 修改冲压库存管理
-     * 
-     * @param sysMaterialStamping 冲压库存管理
+     * 修改冲压件库存管理
+     *
+     * @param sysMaterialStamping 冲压件库存管理
      * @return 结果
      */
     @Override
@@ -68,9 +68,9 @@ public class SysMaterialStampingServiceImpl implements ISysMaterialStampingServi
     }
 
     /**
-     * 批量删除冲压库存管理
-     * 
-     * @param ids 需要删除的冲压库存管理主键
+     * 批量删除冲压件库存管理
+     *
+     * @param ids 需要删除的冲压件库存管理主键
      * @return 结果
      */
     @Override
@@ -80,9 +80,9 @@ public class SysMaterialStampingServiceImpl implements ISysMaterialStampingServi
     }
 
     /**
-     * 删除冲压库存管理信息
-     * 
-     * @param id 冲压库存管理主键
+     * 删除冲压件库存管理信息
+     *
+     * @param id 冲压件库存管理主键
      * @return 结果
      */
     @Override
@@ -90,4 +90,31 @@ public class SysMaterialStampingServiceImpl implements ISysMaterialStampingServi
     {
         return sysMaterialStampingMapper.deleteSysMaterialStampingById(id);
     }
+
+    /**
+     * 导入冲压库存管理数据
+     *
+     * @param stampingList 冲压库存管理列表
+     * @param updateSupport 是否更新支持
+     * @param operName 操作人姓名
+     * @return 导入结果消息
+     */
+    @Override
+    public String importStamping(List<SysMaterialStamping> stampingList, boolean updateSupport, String operName) {
+        // 这里可以添加具体的导入逻辑，例如循环插入或更新数据
+        for (SysMaterialStamping stamping : stampingList) {
+            if (updateSupport) {
+                // 如果支持更新，先尝试更新，更新失败则插入
+                int updateResult = sysMaterialStampingMapper.updateSysMaterialStamping(stamping);
+                if (updateResult == 0) {
+                    sysMaterialStampingMapper.insertSysMaterialStamping(stamping);
+                }
+            } else {
+                // 不支持更新，直接插入
+                sysMaterialStampingMapper.insertSysMaterialStamping(stamping);
+            }
+        }
+        return "导入成功";
+    }
+
 }
