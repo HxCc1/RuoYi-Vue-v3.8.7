@@ -27,10 +27,12 @@
             <if test="supplierId != null "> and supplier_id = #{supplierId}</if>
             <if test="supplierName != null  and supplierName != ''"> and supplier_name like concat('%', #{supplierName}, '%')</if>
             <if test="num != null "> and num = #{num}</if>
-            <if test="entryTime != null "> and entry_time = SUBSTRING( #{entryTime},1,10) </if>
+            <if test="entryTime != null "> and DATE(entry_time) = DATE(#{entryTime}) </if>
         </where>
+        order by material_id, entry_time
     </select>
 
+<!--    用不上-->
     <select id="selectSysMaterialStampingById" parameterType="Long" resultMap="SysMaterialStampingResult">
         <include refid="selectSysMaterialStampingVo"/>
         where id = #{id}
@@ -69,7 +71,7 @@
             <if test="entryTime != null">entry_time = #{entryTime},</if>
             <if test="remark != null">remark = #{remark},</if>
         </trim>
-        where material_id = #{materialId}
+        where id = #{id}
     </update>
 
     <delete id="deleteSysMaterialStampingById" parameterType="Long">

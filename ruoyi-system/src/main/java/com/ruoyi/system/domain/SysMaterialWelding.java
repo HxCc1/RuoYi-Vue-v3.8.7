@@ -8,12 +8,12 @@ import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.core.domain.BaseEntity;
 
 /**
- * 冲压件库存管理对象 sys_material_stamping
+ * 总成件库存管理对象 sys_material_welding
  *
  * @author ruoyi
- * @date 2025-06-04
+ * @date 2025-06-05
  */
-public class SysMaterialStamping extends BaseEntity
+public class SysMaterialWelding extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 
@@ -28,21 +28,13 @@ public class SysMaterialStamping extends BaseEntity
     @Excel(name = "物料名称")
     private String materialName;
 
-    /** 供应商编码 */
-    @Excel(name = "供应商编码")
-    private Long supplierId;
-
-    /** 供应商名称 */
-    @Excel(name = "供应商名称")
-    private String supplierName;
-
-    /** 物料数量 */
-    @Excel(name = "物料数量")
+    /** 数量 */
+    @Excel(name = "数量")
     private Long num;
 
-    /** 物料入库时间 */
+    /** 入库时间 */
     @JsonFormat(pattern = "yyyy-MM-dd")
-    @Excel(name = "物料入库时间", width = 30, dateFormat = "yyyy-MM-dd")
+    @Excel(name = "入库时间", width = 30, dateFormat = "yyyy-MM-dd")
     private Date entryTime;
 
     public void setId(Long id)
@@ -72,24 +64,6 @@ public class SysMaterialStamping extends BaseEntity
     {
         return materialName;
     }
-    public void setSupplierId(Long supplierId)
-    {
-        this.supplierId = supplierId;
-    }
-
-    public Long getSupplierId()
-    {
-        return supplierId;
-    }
-    public void setSupplierName(String supplierName)
-    {
-        this.supplierName = supplierName;
-    }
-
-    public String getSupplierName()
-    {
-        return supplierName;
-    }
     public void setNum(Long num)
     {
         this.num = num;
@@ -115,8 +89,6 @@ public class SysMaterialStamping extends BaseEntity
                 .append("id", getId())
                 .append("materialId", getMaterialId())
                 .append("materialName", getMaterialName())
-                .append("supplierId", getSupplierId())
-                .append("supplierName", getSupplierName())
                 .append("num", getNum())
                 .append("entryTime", getEntryTime())
                 .append("remark", getRemark())

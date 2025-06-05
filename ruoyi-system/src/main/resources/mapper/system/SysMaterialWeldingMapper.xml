@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysMaterialWeldingMapper">
+
+    <resultMap type="SysMaterialWelding" id="SysMaterialWeldingResult">
+        <result property="id"    column="id"    />
+        <result property="materialId"    column="material_id"    />
+        <result property="materialName"    column="material_name"    />
+        <result property="num"    column="num"    />
+        <result property="entryTime"    column="entry_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectSysMaterialWeldingVo">
+        select id, material_id, material_name, num, entry_time, remark from sys_material_welding
+    </sql>
+
+    <select id="selectSysMaterialWeldingList" parameterType="SysMaterialWelding" resultMap="SysMaterialWeldingResult">
+        <include refid="selectSysMaterialWeldingVo"/>
+        <where>
+            <if test="materialId != null "> and material_id = #{materialId}</if>
+            <if test="materialName != null  and materialName != ''"> and material_name like concat('%', #{materialName}, '%')</if>
+            <if test="entryTime != null "> and DATE(entry_time) = DATE(#{entryTime})</if>
+        </where>
+        order by material_id, entry_time
+    </select>
+
+    <select id="selectSysMaterialWeldingById" parameterType="Long" resultMap="SysMaterialWeldingResult">
+        <include refid="selectSysMaterialWeldingVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertSysMaterialWelding" parameterType="SysMaterialWelding" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_material_welding
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="materialId != null">material_id,</if>
+            <if test="materialName != null and materialName != ''">material_name,</if>
+            <if test="num != null">num,</if>
+            <if test="entryTime != null">entry_time,</if>
+            <if test="remark != null">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="materialId != null">#{materialId},</if>
+            <if test="materialName != null and materialName != ''">#{materialName},</if>
+            <if test="num != null">#{num},</if>
+            <if test="entryTime != null">#{entryTime},</if>
+            <if test="remark != null">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="updateSysMaterialWelding" parameterType="SysMaterialWelding">
+        update sys_material_welding
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="materialId != null">material_id = #{materialId},</if>
+            <if test="materialName != null and materialName != ''">material_name = #{materialName},</if>
+            <if test="num != null">num = #{num},</if>
+            <if test="entryTime != null">entry_time = #{entryTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysMaterialWeldingById" parameterType="Long">
+        delete from sys_material_welding where id = #{id}
+    </delete>
+
+    <delete id="deleteSysMaterialWeldingByIds" parameterType="String">
+        delete from sys_material_welding where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

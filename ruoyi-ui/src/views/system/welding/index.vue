@@ -1,7 +1,6 @@
 <template>
   <div class="app-container">
-    <!-- 搜索表单内容 -->
-    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="100px">
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="物料编码" prop="materialId">
         <el-input
           v-model="queryParams.materialId"
@@ -18,28 +17,12 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="供应商编码" prop="supplierId">
-        <el-input
-          v-model="queryParams.supplierId"
-          placeholder="请输入供应商编码"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="供应商名称" prop="supplierName">
-        <el-input
-          v-model="queryParams.supplierName"
-          placeholder="请输入供应商名称"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="物料入库时间" prop="entryTime">
+      <el-form-item label="入库时间" prop="entryTime">
         <el-date-picker clearable
-          v-model="queryParams.entryTime"
-          type="date"
-          value-format="yyyy-MM-dd"
-          placeholder="请选择物料入库时间">
+                        v-model="queryParams.entryTime"
+                        type="date"
+                        value-format="yyyy-MM-dd"
+                        placeholder="请选择入库时间">
         </el-date-picker>
       </el-form-item>
       <el-form-item>
@@ -47,8 +30,8 @@
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
-    <!-- 按钮内容 -->
-    <el-row :gutter="15" class="mb8">
+
+    <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button
           type="primary"
@@ -56,7 +39,7 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
-          v-hasPermi="['system:stamping:add']"
+          v-hasPermi="['system:welding:add']"
         >新增</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -67,7 +50,7 @@
           size="mini"
           :disabled="single"
           @click="handleUpdate"
-          v-hasPermi="['system:stamping:edit']"
+          v-hasPermi="['system:welding:edit']"
         >修改</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -78,22 +61,20 @@
           size="mini"
           :disabled="multiple"
           @click="handleDelete"
-          v-hasPermi="['system:stamping:remove']"
+          v-hasPermi="['system:welding:remove']"
         >删除</el-button>
       </el-col>
-
-<!--  新增导入按键  -->
+      <!--  新增导入按键  -->
       <el-col :span="1.5">
         <el-button
-          type="info"
+          type="warning"
           plain
           icon="el-icon-upload"
           size="mini"
           @click="handleImport"
-          v-hasPermi="['system:stamping:import']"
+          v-hasPermi="['system:welding:import']"
         >导入</el-button>
       </el-col>
-
       <el-col :span="1.5">
         <el-button
           type="warning"
@@ -101,18 +82,17 @@
           icon="el-icon-download"
           size="mini"
           @click="handleExport"
-          v-hasPermi="['system:stamping:export']"
+          v-hasPermi="['system:welding:export']"
         >导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="stampingList" @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" :data="weldingList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
+<!--      <el-table-column label="${comment}" align="center" prop="id" />-->
       <el-table-column label="物料编码" align="center" prop="materialId" />
       <el-table-column label="物料名称" align="center" prop="materialName" />
-      <el-table-column label="供应商编码" align="center" prop="supplierId" />
-      <el-table-column label="供应商名称" align="center" prop="supplierName" />
       <el-table-column label="数量" align="center" prop="num" />
       <el-table-column label="入库时间" align="center" prop="entryTime" width="180">
         <template slot-scope="scope">
@@ -127,14 +107,14 @@
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
-            v-hasPermi="['system:stamping:edit']"
+            v-hasPermi="['system:welding:edit']"
           >修改</el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
-            v-hasPermi="['system:stamping:remove']"
+            v-hasPermi="['system:welding:remove']"
           >删除</el-button>
         </template>
       </el-table-column>
@@ -148,30 +128,24 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改冲压库存管理对话框 -->
+    <!-- 添加或修改总成件库存管理对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
+      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="物料编码" prop="materialId">
           <el-input v-model="form.materialId" placeholder="请输入物料编码" />
         </el-form-item>
         <el-form-item label="物料名称" prop="materialName">
           <el-input v-model="form.materialName" placeholder="请输入物料名称" />
         </el-form-item>
-        <el-form-item label="供应商编码" prop="supplierId">
-          <el-input v-model="form.supplierId" placeholder="请输入供应商编码" />
+        <el-form-item label="数量" prop="num">
+          <el-input v-model="form.num" placeholder="请输入数量" />
         </el-form-item>
-        <el-form-item label="供应商名称" prop="supplierName">
-          <el-input v-model="form.supplierName" placeholder="请输入供应商名称" />
-        </el-form-item>
-        <el-form-item label="物料数量" prop="num">
-          <el-input v-model="form.num" placeholder="请输入物料数量" />
-        </el-form-item>
-        <el-form-item label="物料入库时间" prop="entryTime">
+        <el-form-item label="入库时间" prop="entryTime">
           <el-date-picker clearable
-            v-model="form.entryTime"
-            type="date"
-            value-format="yyyy-MM-dd"
-            placeholder="请选择物料入库时间">
+                          v-model="form.entryTime"
+                          type="date"
+                          value-format="yyyy-MM-dd"
+                          placeholder="请选择入库时间">
           </el-date-picker>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
@@ -184,7 +158,6 @@
       </div>
     </el-dialog>
 
-
     <!-- 新增excel导入对话框 -->
     <el-dialog :title="upload.title" :visible.sync="upload.open" width="400px" append-to-body>
       <el-upload
@@ -192,7 +165,7 @@
         :limit="1"
         accept=".xlsx, .xls"
         :headers="upload.headers"
-        :action="upload.url + '?updateSupport=false'"
+        :action="upload.url + '?updateSupport=' + upload.updateSupport"
         :disabled="upload.isUploading"
         :on-progress="handleFileUploadProgress"
         :on-success="handleFileSuccess"
@@ -219,18 +192,17 @@
 </template>
 
 <script>
-import { listStamping, getStamping, delStamping, addStamping, updateStamping } from "@/api/system/stamping";
+import { listWelding, getWelding, delWelding, addWelding, updateWelding } from "@/api/system/welding";
 import { getToken } from "@/utils/auth";
 
 export default {
-  name: "Stamping",
+  name: "Welding",
   data() {
     return {
       // 遮罩层
       loading: true,
       // 选中数组
       ids: [],
-      matids:[],
       // 非单个禁用
       single: true,
       // 非多个禁用
@@ -239,8 +211,8 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
-      // 冲压库存管理表格数据
-      stampingList: [],
+      // 总成件库存管理表格数据
+      weldingList: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -251,9 +223,6 @@ export default {
         pageSize: 10,
         materialId: null,
         materialName: null,
-        supplierId: null,
-        supplierName: null,
-        num: null,
         entryTime: null,
       },
       // 表单参数
@@ -263,6 +232,12 @@ export default {
         materialId: [
           { required: true, message: "物料编码不能为空", trigger: "blur" }
         ],
+        materialName: [
+          { required: true, message: "物料名称不能为空", trigger: "blur" }
+        ],
+        num: [
+          { required: true, message: "数量不能为空", trigger: "blur" }
+        ]
       },
       upload: {
         // 是否显示弹出层（用户导入）
@@ -272,23 +247,24 @@ export default {
         // 是否禁用上传
         isUploading: false,
         // 是否更新已经存在的物料数据
-        updateSupport: false,
+        updateSupport: "",
         // 设置上传的请求头部
         headers: { Authorization: "Bearer " + getToken() },
         // 上传的地址
-        url: process.env.VUE_APP_BASE_API + "/system/stamping/importData"
+        url: process.env.VUE_APP_BASE_API + "/system/welding/importData"
       }
+
     };
   },
   created() {
     this.getList();
   },
   methods: {
-    /** 查询冲压库存管理列表 */
+    /** 查询总成件库存管理列表 */
     getList() {
       this.loading = true;
-      listStamping(this.queryParams).then(response => {
-        this.stampingList = response.rows;
+      listWelding(this.queryParams).then(response => {
+        this.weldingList = response.rows;
         this.total = response.total;
         this.loading = false;
       });
@@ -304,8 +280,6 @@ export default {
         id: null,
         materialId: null,
         materialName: null,
-        supplierId: null,
-        supplierName: null,
         num: null,
         entryTime: null,
         remark: null
@@ -325,7 +299,6 @@ export default {
     // 多选框选中数据
     handleSelectionChange(selection) {
       this.ids = selection.map(item => item.id)
-      this.matids = selection.map(item => item.materialId)
       this.single = selection.length!==1
       this.multiple = !selection.length
     },
@@ -333,16 +306,16 @@ export default {
     handleAdd() {
       this.reset();
       this.open = true;
-      this.title = "添加冲压库存管理";
+      this.title = "添加总成件库存管理";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
       const id = row.id || this.ids
-      getStamping(id).then(response => {
+      getWelding(id).then(response => {
         this.form = response.data;
         this.open = true;
-        this.title = "修改冲压库存管理";
+        this.title = "修改总成件库存管理";
       });
     },
     /** 提交按钮 */
@@ -350,13 +323,13 @@ export default {
       this.$refs["form"].validate(valid => {
         if (valid) {
           if (this.form.id != null) {
-            updateStamping(this.form).then(response => {
+            updateWelding(this.form).then(response => {
               this.$modal.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
-            addStamping(this.form).then(response => {
+            addWelding(this.form).then(response => {
               this.$modal.msgSuccess("新增成功");
               this.open = false;
               this.getList();
@@ -367,11 +340,9 @@ export default {
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      // const ids = row.id || this.ids;
-      const matids = row.materialId || this.matids;
-      console.log(matids);
-      this.$modal.confirm('是否删除物料编码为"' + matids + '"的数据项？').then(function() {
-        return delStamping(ids);
+      const ids = row.id || this.ids;
+      this.$modal.confirm('是否确认删除总成件库存管理编号为"' + ids + '"的数据项？').then(function() {
+        return delWelding(ids);
       }).then(() => {
         this.getList();
         this.$modal.msgSuccess("删除成功");
@@ -379,19 +350,20 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      this.download('system/stamping/export', {
+      this.download('system/welding/export', {
         ...this.queryParams
-      }, `stamping_${new Date().getTime()}.xlsx`)
+      }, `welding_${new Date().getTime()}.xlsx`)
     },
+
     /** 导入按钮操作 */
     handleImport() {
-      this.upload.title = "冲压件导入";
+      this.upload.title = "焊装件导入";
       this.upload.open = true;
     },
     /** 下载模板操作 */
     importTemplate() {
-      this.download('system/stamping/importTemplate', {
-      }, `stamping_material_template_${new Date().getTime()}.xlsx`)
+      this.download('system/welding/importTemplate', {
+      }, `welding_material_template_${new Date().getTime()}.xlsx`)
     },
     // 文件上传中处理
     handleFileUploadProgress(event, file, fileList) {
@@ -409,6 +381,7 @@ export default {
     submitFileForm() {
       this.$refs.upload.submit();
     }
+
 
   }
 };
