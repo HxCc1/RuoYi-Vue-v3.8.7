@@ -1,6 +1,8 @@
 package com.ruoyi.system.mapper;
 
 import java.util.List;
+import java.util.Map;
+
 import com.ruoyi.system.domain.SysMaterialWelding;
 
 /**
@@ -58,4 +60,12 @@ public interface SysMaterialWeldingMapper
      * @return 结果
      */
     public int deleteSysMaterialWeldingByIds(Long[] ids);
+
+    /**
+     * 报工冲压物料
+     *
+     * @param materialList 需要报工的物料编码与数量
+     * @return 结果
+     */
+    public int syncStampingByMateriaId(List<SysMaterialWelding> materialList);
 }

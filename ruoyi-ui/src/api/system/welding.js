@@ -54,3 +54,15 @@ export function importWelding(data) {
     }
   })
 }
+
+// 报工焊装库存数据
+export function syncStamping(data) {
+  return request({
+    url: '/system/welding/syncStamping',
+    method: 'post',
+    data: data,
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
+}

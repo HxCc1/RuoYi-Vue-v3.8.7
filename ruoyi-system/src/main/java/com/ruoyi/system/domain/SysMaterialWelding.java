@@ -37,50 +37,61 @@ public class SysMaterialWelding extends BaseEntity
     @Excel(name = "入库时间", width = 30, dateFormat = "yyyy-MM-dd")
     private Date entryTime;
 
+    /** 报工状态 */
+    private int syncFlag;
+
     public void setId(Long id)
     {
         this.id = id;
     }
-
     public Long getId()
     {
         return id;
     }
+
     public void setMaterialId(Long materialId)
     {
         this.materialId = materialId;
     }
-
     public Long getMaterialId()
     {
         return materialId;
     }
+
     public void setMaterialName(String materialName)
     {
         this.materialName = materialName;
     }
-
     public String getMaterialName()
     {
         return materialName;
     }
+
     public void setNum(Long num)
     {
         this.num = num;
     }
-
     public Long getNum()
     {
         return num;
     }
+
     public void setEntryTime(Date entryTime)
     {
         this.entryTime = entryTime;
     }
-
     public Date getEntryTime()
     {
         return entryTime;
+    }
+
+
+    public int getSyncFlag() {
+        return syncFlag;
+    }
+
+    public void setSyncFlag(int syncFlag) {
+        this.syncFlag = syncFlag;
     }
 
     @Override
@@ -92,6 +103,7 @@ public class SysMaterialWelding extends BaseEntity
                 .append("num", getNum())
                 .append("entryTime", getEntryTime())
                 .append("remark", getRemark())
+                .append("syncFlag",getSyncFlag())
                 .toString();
     }
 }

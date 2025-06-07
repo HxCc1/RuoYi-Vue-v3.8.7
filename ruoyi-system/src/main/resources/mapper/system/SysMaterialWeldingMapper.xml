@@ -11,10 +11,11 @@
         <result property="num"    column="num"    />
         <result property="entryTime"    column="entry_time"    />
         <result property="remark"    column="remark"    />
+        <result property="syncFlag"    column="sync_flag"    />
     </resultMap>
 
     <sql id="selectSysMaterialWeldingVo">
-        select id, material_id, material_name, num, entry_time, remark from sys_material_welding
+        select id, material_id, material_name, num, entry_time, remark, sync_flag from sys_material_welding
     </sql>
 
     <select id="selectSysMaterialWeldingList" parameterType="SysMaterialWelding" resultMap="SysMaterialWeldingResult">
@@ -72,4 +73,9 @@
             #{id}
         </foreach>
     </delete>
+
+    <update id="syncStampingByMateriaId" parameterType="List<Map<String,Object>>">
+
+    </update>>
+
 </mapper>

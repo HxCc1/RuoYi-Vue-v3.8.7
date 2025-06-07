@@ -1,6 +1,8 @@
 package com.ruoyi.system.service.impl;
 
 import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.system.mapper.SysMaterialWeldingMapper;
@@ -112,8 +114,23 @@ public class SysMaterialWeldingServiceImpl implements ISysMaterialWeldingService
             } else {
                 // 不支持更新，直接插入
                 sysMaterialWeldingMapper.insertSysMaterialWelding(stamping);
+
+                // 触发冲压库存扣减
             }
         }
         return "导入成功";
+    }
+
+    /**
+     * 报工物料数据
+     *
+     * @param materialList 报工物料数据列表
+     * @return 结果
+     */
+    @Override
+    public int syncStampingByMateriaId(List<SysMaterialWelding> materialList)
+    {
+        
+        return sysMaterialWeldingMapper.syncStampingByMateriaId(materialList);
     }
 }

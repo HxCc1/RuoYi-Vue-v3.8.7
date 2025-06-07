@@ -1,6 +1,8 @@
 package com.ruoyi.system.service;
 
 import java.util.List;
+import java.util.Map;
+
 import com.ruoyi.system.domain.SysMaterialWelding;
 
 /**
@@ -68,4 +70,12 @@ public interface ISysMaterialWeldingService
      * @return 导入结果消息
      */
     String importWelding(List<SysMaterialWelding> stampingList, boolean updateSupport, String operName);
+
+    /**
+     * 焊装报工冲压物料数据
+     *
+     * @param materialList 报工物料数据列表
+     * @return 报工结果
+     */
+    public int syncStampingByMateriaId(List<SysMaterialWelding> materialList);
 }

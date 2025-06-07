@@ -325,7 +325,7 @@ export default {
     // 多选框选中数据
     handleSelectionChange(selection) {
       this.ids = selection.map(item => item.id)
-      this.matids = selection.map(item => item.materialId)
+      this.mats = selection.map(item => item.materialId)
       this.single = selection.length!==1
       this.multiple = !selection.length
     },
@@ -367,10 +367,10 @@ export default {
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      // const ids = row.id || this.ids;
-      const matids = row.materialId || this.matids;
-      console.log(matids);
-      this.$modal.confirm('是否删除物料编码为"' + matids + '"的数据项？').then(function() {
+      const ids = row.id || this.ids;
+      const mats = row.materialId || this.mats;
+      console.log(mats);
+      this.$modal.confirm('是否删除物料编码为"' + mats + '"的数据项？').then(function() {
         return delStamping(ids);
       }).then(() => {
         this.getList();

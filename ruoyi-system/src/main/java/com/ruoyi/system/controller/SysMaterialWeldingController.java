@@ -111,10 +111,25 @@ public class SysMaterialWeldingController extends BaseController
         return success(message);
     }
 
+    /**
+     * 导入excel模板下载
+     */
     @PostMapping("/importTemplate")
     public void importTemplate(HttpServletResponse response)
     {
         ExcelUtil<SysMaterialWelding> util = new ExcelUtil<SysMaterialWelding>(SysMaterialWelding.class);
         util.importTemplateExcel(response, "物料数据");
     }
+
+    /**
+     * 报工冲压库存管理数据
+     */
+    @PreAuthorize("@ss.hasPermi('system:welding:syncStamping')")
+    @Log(title = "冲压库存管理", businessType = BusinessType.IMPORT)
+    @PostMapping("/syncStamping")
+    public AjaxResult syncStampingMateria(@RequestBody List<SysMaterialWelding> materialList) {
+
+        return toAjax(sysMaterialWeldingService.syncStampingByMateriaId(materialList));
+    }
+
 }
