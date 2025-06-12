@@ -5,13 +5,13 @@
 <mapper namespace="com.ruoyi.system.mapper.SysMaterialWeldingMapper">
 
     <resultMap type="SysMaterialWelding" id="SysMaterialWeldingResult">
-        <result property="id"    column="id"    />
-        <result property="materialId"    column="material_id"    />
-        <result property="materialName"    column="material_name"    />
-        <result property="num"    column="num"    />
-        <result property="entryTime"    column="entry_time"    />
-        <result property="remark"    column="remark"    />
-        <result property="syncFlag"    column="sync_flag"    />
+        <result property="id" column="id"/>
+        <result property="materialId" column="material_id"/>
+        <result property="materialName" column="material_name"/>
+        <result property="num" column="num"/>
+        <result property="entryTime" column="entry_time"/>
+        <result property="remark" column="remark"/>
+        <result property="syncFlag" column="sync_flag"/>
     </resultMap>
 
     <sql id="selectSysMaterialWeldingVo">
@@ -21,9 +21,11 @@
     <select id="selectSysMaterialWeldingList" parameterType="SysMaterialWelding" resultMap="SysMaterialWeldingResult">
         <include refid="selectSysMaterialWeldingVo"/>
         <where>
-            <if test="materialId != null "> and material_id = #{materialId}</if>
-            <if test="materialName != null  and materialName != ''"> and material_name like concat('%', #{materialName}, '%')</if>
-            <if test="entryTime != null "> and DATE(entry_time) = DATE(#{entryTime})</if>
+            <if test="materialId != null ">and material_id = #{materialId}</if>
+            <if test="materialName != null  and materialName != ''">and material_name like concat('%', #{materialName},
+                '%')
+            </if>
+            <if test="entryTime != null ">and DATE(entry_time) = DATE(#{entryTime})</if>
         </where>
         order by material_id, entry_time
     </select>
@@ -74,8 +76,26 @@
         </foreach>
     </delete>
 
-    <update id="syncStampingByMateriaId" parameterType="List<Map<String,Object>>">
+    <update id="syncStampingByMateriaId" parameterType="SysMaterialWelding">
+        update sys_material_welding
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="materialId != null">material_id = #{materialId},</if>
+            <if test="materialName != null and materialName != ''">material_name = #{materialName},</if>
+            <if test="num != null">num = #{num},</if>
+            <if test="entryTime != null">entry_time = #{entryTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
 
-    </update>>
+    <select id="selectSyncedWeldingIds" parameterType="java.util.List" resultType="java.lang.Long">
+        <include refid="selectSysMaterialWeldingVo"/>
+        select id
+        from sys_material_welding
+        where sync_flag=1 and id in
+        <foreach item="id" collection="list" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
 
 </mapper>

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.ruoyi.system.domain.SysMaterialWelding;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 总成件库存管理Mapper接口
@@ -68,4 +69,12 @@ public interface SysMaterialWeldingMapper
      * @return 结果
      */
     public int syncStampingByMateriaId(List<SysMaterialWelding> materialList);
+
+    /**
+     * 查询物料是否已同步
+     *
+     * @param ids 需要查询的物料编码
+     * @return 结果
+     */
+    List<Long> selectSyncedWeldingIds(List<Long> ids);
 }

@@ -72,10 +72,19 @@ public interface ISysMaterialWeldingService
     String importWelding(List<SysMaterialWelding> stampingList, boolean updateSupport, String operName);
 
     /**
+     * 查询是否已经报工
+     *
+     * @param ids 报工物料数据id
+     * @return 结果
+     */
+    public List<Long> selectSyncedIds(List<Long> ids);
+
+    /**
      * 焊装报工冲压物料数据
      *
      * @param materialList 报工物料数据列表
      * @return 报工结果
      */
     public int syncStampingByMateriaId(List<SysMaterialWelding> materialList);
+
 }

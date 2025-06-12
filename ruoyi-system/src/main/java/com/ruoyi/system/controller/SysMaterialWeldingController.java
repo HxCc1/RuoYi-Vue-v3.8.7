@@ -1,6 +1,9 @@
 package com.ruoyi.system.controller;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +17,7 @@ import com.ruoyi.system.service.ISysMaterialWeldingService;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
 import org.springframework.web.multipart.MultipartFile;
+import com.ruoyi.system.util.WebServiceUtils;
 
 /**
  * 总成件库存管理Controller
@@ -129,6 +133,36 @@ public class SysMaterialWeldingController extends BaseController
     @PostMapping("/syncStamping")
     public AjaxResult syncStampingMateria(@RequestBody List<SysMaterialWelding> materialList) {
 
+        if (materialList == null || materialList.isEmpty()) {
+            throw new IllegalArgumentException("未选择需要报工的记录");
+        }
+
+        // 幂等性校验
+        // 提取待同步记录的ID列表
+        List<Long> ids = materialList.stream()
+                .map(SysMaterialWelding::getId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        if (ids.isEmpty()) {
+            return AjaxResult.error("选中的记录中不包含有效ID");
+        }
+
+        // 查询已同步的记录ID
+        List<Long> syncedIds = sysMaterialWeldingService.selectSyncedIds(ids);
+        // 不为空
+        if (!syncedIds.isEmpty()) {
+            // 构建错误提示信息（限制显示数量）
+            String syncedIdStr = syncedIds.stream()
+                    .limit(5)
+                    .map(String::valueOf)
+                    .collect(Collectors.joining("、"));
+            String message = syncedIds.size() <= 5
+                    ? "记录ID[" + syncedIdStr + "]已同步，不可重复报工"
+                    : "记录ID[" + syncedIdStr + "等]已同步，不可重复报工";
+            return AjaxResult.error(message);
+        }
+        // 调用BOM接口，计算报工数量
         return toAjax(sysMaterialWeldingService.syncStampingByMateriaId(materialList));
     }
 

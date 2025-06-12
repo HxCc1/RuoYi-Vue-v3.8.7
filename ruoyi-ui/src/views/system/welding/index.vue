@@ -381,7 +381,9 @@ export default {
           : `${materialIds}等`;
         message += '，请检查后重新提交';
 
-        return this.$message.warning(message);
+        return this.$message.warning(message).then(() => {
+          this.getList(); // 校验后刷新数据
+        });
       }
 
       // 若所有选中记录均未同步，继续执行同步逻辑
@@ -392,7 +394,7 @@ export default {
       }).then(async () => {
         try {
           // const weldingIds = unsyncedRows.map(row => row.materialId);
-          const response = await syncStamping(unsyncedRows);
+          const response = await syncStamping(unsyncedRows);  // 直接传入的JSON数据
           if (response.code === 200) {
             this.$message.success('报工成功');
             this.getList();

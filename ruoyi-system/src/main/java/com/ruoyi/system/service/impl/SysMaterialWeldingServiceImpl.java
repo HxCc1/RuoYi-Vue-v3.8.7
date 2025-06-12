@@ -3,6 +3,7 @@ package com.ruoyi.system.service.impl;
 import java.util.List;
 import java.util.Map;
 
+import com.ruoyi.system.util.WebServiceUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.system.mapper.SysMaterialWeldingMapper;
@@ -114,11 +115,20 @@ public class SysMaterialWeldingServiceImpl implements ISysMaterialWeldingService
             } else {
                 // 不支持更新，直接插入
                 sysMaterialWeldingMapper.insertSysMaterialWelding(stamping);
-
-                // 触发冲压库存扣减
             }
         }
         return "导入成功";
+    }
+
+    /**
+     * 查询是否已经报工
+     *
+     * @param ids 报工物料数据id
+     * @return 结果
+     */
+    // 查询已同步的记录ID，需要修改 传入的ids是一个列表
+    public List<Long> selectSyncedIds(List<Long> ids) {
+        return sysMaterialWeldingMapper.selectSyncedWeldingIds(ids);
     }
 
     /**
@@ -130,7 +140,36 @@ public class SysMaterialWeldingServiceImpl implements ISysMaterialWeldingService
     @Override
     public int syncStampingByMateriaId(List<SysMaterialWelding> materialList)
     {
-        
+        // 补充报工相关的逻辑处理：调用接口，计算数量等
+
+        // 记录同步结果
+        StringBuilder resultMsg = new StringBuilder();
+        int successCount = 0;
+        int failedCount = 0;
+
+        for (SysMaterialWelding mat : materialList) {
+            try {
+                // 跳过已同步的记录
+                if (mat.getSyncFlag() == 1){
+                    continue;
+                }
+                // 调用接口，获取BOM明细
+                // 返回类型需要等接口调通 看到返回值之后更新
+                Map<String,String> stampingDetails = WebServiceUtils.getBOMData(mat.getMaterialId());
+                if (stampingDetails.isEmpty()) {
+                    resultMsg.append("焊装物料ID:").append(mat.getMaterialId()).append("未找到BOM明细\n");
+                    failedCount++;
+                    continue;
+                }
+                /**
+                 * TO BE CONTINUE
+                 * */
+            } catch (Exception e) {
+                resultMsg.append("焊装物料ID:").append(mat.getMaterialId()).append("同步失败:").append(e.getMessage()).append("\n");
+                failedCount++;
+                // 单个物料同步失败，继续处理其他物料
+            }
+        }
         return sysMaterialWeldingMapper.syncStampingByMateriaId(materialList);
     }
 }

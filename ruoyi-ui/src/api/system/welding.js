@@ -60,9 +60,9 @@ export function syncStamping(data) {
   return request({
     url: '/system/welding/syncStamping',
     method: 'post',
-    data: data,
-    headers: {
-      'Content-Type': 'multipart/form-data'
-    }
+    data: data  // 直接传递JSON数据
+    // headers: {
+    //   'Content-Type': 'multipart/form-data'
+    // }
   })
 }
