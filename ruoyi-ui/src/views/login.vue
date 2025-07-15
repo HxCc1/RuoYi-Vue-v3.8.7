@@ -162,7 +162,7 @@ export default {
   align-items: center;
   //position: relative;
   height: 100%;
-  background-image: url("../assets/images/login-background (2).jpg");
+  background-image: url("../assets/images/login-background (3).png");
   background-size: cover;
 }
 .title {
@@ -174,9 +174,9 @@ export default {
 .login-form {
   position: absolute;
   /* 距离顶部 20% */
-  top: 40%;
+  top: 34%;
   /* 距离右侧 10% */
-  right: 15%;
+  right: 18%;
 
 
   border-radius: 6px;

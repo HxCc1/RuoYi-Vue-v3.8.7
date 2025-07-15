@@ -37,7 +37,7 @@ public class WebServiceUtils {
                 // 移除JSON值中的空格
                 String cleanedJsonResult = removeSpacesFromJsonValues(result);
                 log.debug("处理后的JSON: " + cleanedJsonResult);
-
+                
                 // 关键修改：使用JSONArray解析数组
                 JSONArray array = JSONArray.parseArray(cleanedJsonResult);
 
