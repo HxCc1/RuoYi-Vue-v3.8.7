@@ -23,9 +23,9 @@ import java.util.Map;
 public class WebServiceUtils {
     private static final Logger log = LoggerFactory.getLogger(WebServiceUtils.class);
 
-    public static Map<String, String> getBOMData(Long materialId) {
+    public static Map<String, Integer> getBOMData(String materialId) {
         String url = "http://10.20.0.8/ws/index.php/Home/Index/getSAPInfo";
-        Map<String, Long> params = new HashMap<>();
+        Map<String, String> params = new HashMap<>();
         params.put("materialId", materialId);
         String result = callByParamStr(url, "getSingleBom", params);
 
@@ -42,11 +42,12 @@ public class WebServiceUtils {
                 JSONArray array = JSONArray.parseArray(cleanedJsonResult);
 
                 // 转换为Map（假设需要以component为键）
-                Map<String, String> resultMap = new HashMap<>();
+                Map<String, Integer> resultMap = new HashMap<>();
                 for (int i = 0; i < array.size(); i++) {
                     JSONObject item = array.getJSONObject(i);
                     String component = item.getString("component");
-                    resultMap.put(component, item.toJSONString());
+                    String compQty = item.getString("comp_qty").split("\\.")[0];
+                    resultMap.put(component, Integer.parseInt(compQty));
                     // 或提取特定字段：resultMap.put(component, item.getString("comp_qty"));
                 }
                 log.info(url + " - " + "getSingleBom" + " -- 解析成功，返回结果: " + resultMap);
@@ -58,7 +59,7 @@ public class WebServiceUtils {
         }
     }
 
-    public static String callByParamStr(String endpoint, String func, Map<String, Long> params) {
+    public static String callByParamStr(String endpoint, String func, Map<String, String> params) {
         String result = "";
         if (params.isEmpty()) {
             log.error(endpoint + " - " + func + " - 参数为空!");
@@ -75,7 +76,7 @@ public class WebServiceUtils {
             call.setReturnType(XMLType.XSD_STRING); // 返回类型
 
             // 添加参数，注意这里需要将Long类型转换为String类型
-            for (Map.Entry<String, Long> entry : params.entrySet()) {
+            for (Map.Entry<String, String> entry : params.entrySet()) {
                 call.addParameter(entry.getKey(), XMLType.XSD_STRING, ParameterMode.IN);
             }
 
@@ -210,6 +211,18 @@ public class WebServiceUtils {
         }
 
         return result;
+    }
+
+    public static void main(String[] args) {
+        String materialId = "455020213"; // 示例物料ID
+        Map<String, Integer> bomData = getBOMData(materialId);
+        if (bomData != null) {
+            for (Map.Entry<String, Integer> entry : bomData.entrySet()) {
+                System.out.println("Component: " + entry.getKey() + ", Data: " + entry.getValue());
+            }
+        } else {
+            System.out.println("未获取到BOM数据");
+        }
     }
 
 }

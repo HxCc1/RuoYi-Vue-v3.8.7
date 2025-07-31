@@ -219,7 +219,7 @@
 </template>
 
 <script>
-import { listStamping, getStamping, delStamping, addStamping, updateStamping } from "@/api/system/stamping";
+import { listStamping, getStamping, delStamping, addStamping, updateStamping } from "@/api/material/stamping";
 import { getToken } from "@/utils/auth";
 
 export default {

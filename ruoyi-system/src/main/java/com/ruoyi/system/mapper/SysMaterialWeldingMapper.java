@@ -77,4 +77,13 @@ public interface SysMaterialWeldingMapper
      * @return 结果
      */
     List<Long> selectSyncedWeldingIds(List<Long> ids);
+
+    /**
+     * 查询物料是否已同步
+     *
+     * @param materialId
+     * @return 结果
+     */
+    public int updateWeldingSyncFlag( @Param("materialId") String materialId);
+
 }

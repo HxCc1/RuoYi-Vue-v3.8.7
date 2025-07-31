@@ -162,8 +162,10 @@ export default {
   align-items: center;
   //position: relative;
   height: 100%;
-  background-image: url("../assets/images/login-background (3).png");
+  background-image: url("../assets/images/login-background (3).jpg");
   background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 .title {
   margin: 0px auto 30px auto;
@@ -176,12 +178,12 @@ export default {
   /* 距离顶部 20% */
   top: 34%;
   /* 距离右侧 10% */
-  right: 18%;
+  right: 10%;
 
 
   border-radius: 6px;
   background: #ffffff;
-  width: 400px;
+  width: 350px;
   padding: 25px 25px 5px 25px;
   .el-input {
     height: 38px;
@@ -222,6 +224,7 @@ export default {
   letter-spacing: 1px;
 }
 .login-code-img { // 验证码图片
-  height: 48px;
+  height: 42px;
+  width:  100px;
 }
 </style>

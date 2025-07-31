@@ -189,7 +189,7 @@
 </template>
 
 <script>
-import { listWelding, getWelding, delWelding, addWelding, updateWelding, syncStamping } from "@/api/system/welding";
+import { listWelding, getWelding, delWelding, addWelding, updateWelding, syncStamping } from "@/api/material/welding";
 import { getToken } from "@/utils/auth";
 
 export default {

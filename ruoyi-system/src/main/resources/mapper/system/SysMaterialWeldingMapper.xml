@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.system.mapper.SysMaterialWeldingMapper">
 
-    <resultMap type="SysMaterialWelding" id="SysMaterialWeldingResult">
+    <resultMap type="com.ruoyi.system.domain.SysMaterialWelding" id="SysMaterialWeldingResult">
         <result property="id" column="id"/>
         <result property="materialId" column="material_id"/>
         <result property="materialName" column="material_name"/>
@@ -18,7 +18,7 @@
         select id, material_id, material_name, num, entry_time, remark, sync_flag from sys_material_welding
     </sql>
 
-    <select id="selectSysMaterialWeldingList" parameterType="SysMaterialWelding" resultMap="SysMaterialWeldingResult">
+    <select id="selectSysMaterialWeldingList" parameterType="com.ruoyi.system.domain.SysMaterialWelding" resultMap="SysMaterialWeldingResult">
         <include refid="selectSysMaterialWeldingVo"/>
         <where>
             <if test="materialId != null ">and material_id = #{materialId}</if>
@@ -35,7 +35,7 @@
         where id = #{id}
     </select>
 
-    <insert id="insertSysMaterialWelding" parameterType="SysMaterialWelding" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertSysMaterialWelding" parameterType="com.ruoyi.system.domain.SysMaterialWelding" useGeneratedKeys="true" keyProperty="id">
         insert into sys_material_welding
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="materialId != null">material_id,</if>
@@ -53,7 +53,7 @@
         </trim>
     </insert>
 
-    <update id="updateSysMaterialWelding" parameterType="SysMaterialWelding">
+    <update id="updateSysMaterialWelding" parameterType="com.ruoyi.system.domain.SysMaterialWelding">
         update sys_material_welding
         <trim prefix="SET" suffixOverrides=",">
             <if test="materialId != null">material_id = #{materialId},</if>
@@ -61,6 +61,7 @@
             <if test="num != null">num = #{num},</if>
             <if test="entryTime != null">entry_time = #{entryTime},</if>
             <if test="remark != null">remark = #{remark},</if>
+            <if test="syncFlag != null">syncFlag = #{syncFlag}</if>
         </trim>
         where id = #{id}
     </update>
@@ -76,7 +77,7 @@
         </foreach>
     </delete>
 
-    <update id="syncStampingByMateriaId" parameterType="SysMaterialWelding">
+    <update id="syncStampingByMateriaId" parameterType="com.ruoyi.system.domain.SysMaterialWelding">
         update sys_material_welding
         <trim prefix="SET" suffixOverrides=",">
             <if test="materialId != null">material_id = #{materialId},</if>
@@ -89,7 +90,6 @@
     </update>
 
     <select id="selectSyncedWeldingIds" parameterType="java.util.List" resultType="java.lang.Long">
-        <include refid="selectSysMaterialWeldingVo"/>
         select id
         from sys_material_welding
         where sync_flag=1 and id in
@@ -97,5 +97,12 @@
             #{id}
         </foreach>
     </select>
+
+    <!-- 设置同步状态为已同步 -->
+    <update id="updateWeldingSyncFlag">
+        UPDATE sys_material_welding
+        SET sync_flag = 1
+        WHERE  material_id = #{materialId}
+    </update>
 
 </mapper>

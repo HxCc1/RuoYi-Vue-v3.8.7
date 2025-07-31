@@ -85,6 +85,6 @@ public interface ISysMaterialWeldingService
      * @param materialList 报工物料数据列表
      * @return 报工结果
      */
-    public int syncStampingByMateriaId(List<SysMaterialWelding> materialList);
+    public String syncStampingByMateriaId(List<SysMaterialWelding> materialList);
 
 }

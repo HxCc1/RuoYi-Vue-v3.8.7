@@ -22,7 +22,7 @@ public class SysMaterialStamping extends BaseEntity
 
     /** 物料编码 */
     @Excel(name = "物料编码")
-    private Long materialId;
+    private String materialId;
 
     /** 物料名称 */
     @Excel(name = "物料名称")
@@ -30,7 +30,7 @@ public class SysMaterialStamping extends BaseEntity
 
     /** 供应商编码 */
     @Excel(name = "供应商编码")
-    private Long supplierId;
+    private String supplierId;
 
     /** 供应商名称 */
     @Excel(name = "供应商名称")
@@ -38,75 +38,85 @@ public class SysMaterialStamping extends BaseEntity
 
     /** 物料数量 */
     @Excel(name = "物料数量")
-    private Long num;
+    private int num;
 
     /** 物料入库时间 */
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Excel(name = "物料入库时间", width = 30, dateFormat = "yyyy-MM-dd")
     private Date entryTime;
 
+    /** 乐观锁version */
+    private int version;
+
+
     public void setId(Long id)
     {
         this.id = id;
     }
-
     public Long getId()
     {
         return id;
     }
-    public void setMaterialId(Long materialId)
+
+    public void setMaterialId(String materialId)
     {
         this.materialId = materialId;
     }
-
-    public Long getMaterialId()
+    public String getMaterialId()
     {
         return materialId;
     }
+
     public void setMaterialName(String materialName)
     {
         this.materialName = materialName;
     }
-
     public String getMaterialName()
     {
         return materialName;
     }
-    public void setSupplierId(Long supplierId)
+
+    public void setSupplierId(String supplierId)
     {
         this.supplierId = supplierId;
     }
-
-    public Long getSupplierId()
+    public String getSupplierId()
     {
         return supplierId;
     }
+
     public void setSupplierName(String supplierName)
     {
         this.supplierName = supplierName;
     }
-
     public String getSupplierName()
     {
         return supplierName;
     }
-    public void setNum(Long num)
+
+    public void setNum(int num)
     {
         this.num = num;
     }
-
-    public Long getNum()
+    public int getNum()
     {
         return num;
     }
+
     public void setEntryTime(Date entryTime)
     {
         this.entryTime = entryTime;
     }
-
     public Date getEntryTime()
     {
         return entryTime;
+    }
+
+    public int getVersion() {
+        return version;
+    }
+    public void setVersion(int version) {
+        this.version = version;
     }
 
     @Override

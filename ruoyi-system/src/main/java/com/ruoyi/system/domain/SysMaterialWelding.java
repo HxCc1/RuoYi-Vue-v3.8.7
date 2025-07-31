@@ -22,7 +22,7 @@ public class SysMaterialWelding extends BaseEntity
 
     /** 物料编码 */
     @Excel(name = "物料编码")
-    private Long materialId;
+    private String materialId;
 
     /** 物料名称 */
     @Excel(name = "物料名称")
@@ -30,12 +30,15 @@ public class SysMaterialWelding extends BaseEntity
 
     /** 数量 */
     @Excel(name = "数量")
-    private Long num;
+    private int num;
 
     /** 入库时间 */
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Excel(name = "入库时间", width = 30, dateFormat = "yyyy-MM-dd")
     private Date entryTime;
+
+    /** 备注 */
+    private String remark;
 
     /** 报工状态 */
     private int syncFlag;
@@ -49,11 +52,11 @@ public class SysMaterialWelding extends BaseEntity
         return id;
     }
 
-    public void setMaterialId(Long materialId)
+    public void setMaterialId(String materialId)
     {
         this.materialId = materialId;
     }
-    public Long getMaterialId()
+    public String getMaterialId()
     {
         return materialId;
     }
@@ -67,11 +70,11 @@ public class SysMaterialWelding extends BaseEntity
         return materialName;
     }
 
-    public void setNum(Long num)
+    public void setNum(int num)
     {
         this.num = num;
     }
-    public Long getNum()
+    public int getNum()
     {
         return num;
     }
@@ -85,11 +88,19 @@ public class SysMaterialWelding extends BaseEntity
         return entryTime;
     }
 
+    @Override
+    public String getRemark() {
+        return remark;
+    }
+
+    @Override
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
 
     public int getSyncFlag() {
         return syncFlag;
     }
-
     public void setSyncFlag(int syncFlag) {
         this.syncFlag = syncFlag;
     }

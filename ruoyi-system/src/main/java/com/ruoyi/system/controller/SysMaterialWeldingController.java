@@ -163,7 +163,8 @@ public class SysMaterialWeldingController extends BaseController
             return AjaxResult.error(message);
         }
         // 调用BOM接口，计算报工数量
-        return toAjax(sysMaterialWeldingService.syncStampingByMateriaId(materialList));
+        return success(sysMaterialWeldingService.syncStampingByMateriaId(materialList));
+
     }
 
 }

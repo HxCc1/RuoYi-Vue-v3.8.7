@@ -25,16 +25,16 @@
       </el-col>
     </el-row>
 
-    
+
   </div>
 </template>
 
 <script>
-import PanelGroup from './dashboard/PanelGroup'
-import LineChart from './dashboard/LineChart'
-import RaddarChart from './dashboard/RaddarChart'
-import PieChart from './dashboard/PieChart'
-import BarChart from './dashboard/BarChart'
+import PanelGroup from "@/views/dashboard/PanelGroup.vue";
+import LineChart from '@/views/dashboard/LineChart.vue'
+import RaddarChart from '@/views/dashboard/RaddarChart.vue'
+import PieChart from '@/views/dashboard/PieChart.vue'
+import BarChart from '@/views/dashboard/BarChart.vue'
 
 const lineChartData = {
   newVisitis: {

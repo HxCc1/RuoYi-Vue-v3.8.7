@@ -2,6 +2,7 @@ package com.ruoyi.system.mapper;
 
 import java.util.List;
 import com.ruoyi.system.domain.SysMaterialStamping;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 冲压件库存管理Mapper接口
@@ -58,4 +59,26 @@ public interface SysMaterialStampingMapper
      * @return 结果
      */
     public int deleteSysMaterialStampingByIds(Long[] ids);
+
+    /**
+     * 查询库存中是否存在该物料
+     */
+    public List<SysMaterialStamping> selectSysMaterialStampingByMatId(String stampingId);
+
+    /**
+     * 查询可用的库存批次（按入库时间升序排列）
+     */
+    public List<SysMaterialStamping> selectAvailableBatches(String stampingId);
+
+    /**
+     * 扣减批次库存（带乐观锁）
+     */
+    public int reduceBatchInventory(@Param("id") Long id,
+                                    @Param("reduceNum") int reduceNum,
+                                    @Param("version") int version);
+
+    /**
+     * 标记批次为已用完
+     */
+    int markBatchAsUsed(Long id);
 }
