@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.ruoyi.system.domain.SysMaterialWelding;
+import com.ruoyi.system.domain.SysMaterialWeldingPainting;
 import org.apache.ibatis.annotations.Param;
 
 /**
@@ -86,4 +87,10 @@ public interface SysMaterialWeldingMapper
      */
     public int updateWeldingSyncFlag( @Param("materialId") String materialId);
 
+    /**
+     * 批量插入总成物料号转序信息
+     * @param list 总成物料号转序信息列表
+     * @return 插入条数
+     */
+    int batchInsertSysMaterialWeldingPainting(@Param("list") List<SysMaterialWeldingPainting> list);
 }

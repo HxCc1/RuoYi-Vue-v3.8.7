@@ -396,7 +396,28 @@ export default {
           // const weldingIds = unsyncedRows.map(row => row.materialId);
           const response = await syncStamping(unsyncedRows);  // 直接传入的JSON数据
           if (response.code === 200) {
-            this.$message.success('报工成功');
+            // 解析后端返回的报工结果消息
+            const resultMsg = response.data || response.msg || '';
+
+            // 从返回消息中提取成功和失败的数量
+            const successMatch = resultMsg.match(/成功:(\d+)条/);
+            const failedMatch = resultMsg.match(/失败:(\d+)条/);
+
+            const successCount = successMatch ? parseInt(successMatch[1]) : 0;
+            const failedCount = failedMatch ? parseInt(failedMatch[1]) : 0;
+
+            if (failedCount === 0) {
+              // 全部成功
+              this.$message.success(`报工成功！共处理 ${successCount} 条记录`);
+            } else if (successCount === 0) {
+              // 全部失败
+              this.$message.error(`报工失败！${resultMsg}`);
+            } else {
+              // 部分成功部分失败
+              this.$message.warning(`报工完成！成功 ${successCount} 条，失败 ${failedCount} 条。详情：${resultMsg}`);
+            }
+
+            // 无论结果如何都刷新列表，因为可能有部分记录状态发生了变化
             this.getList();
           } else {
             this.$message.error(response.msg);

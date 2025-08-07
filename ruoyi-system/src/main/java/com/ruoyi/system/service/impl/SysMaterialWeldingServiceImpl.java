@@ -1,10 +1,9 @@
 package com.ruoyi.system.service.impl;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.ruoyi.system.domain.SysMaterialStamping;
+import com.ruoyi.system.domain.SysMaterialWeldingPainting;
 import com.ruoyi.system.mapper.SysMaterialStampingMapper;
 import com.ruoyi.system.util.WebServiceUtils;
 import org.slf4j.Logger;
@@ -15,6 +14,8 @@ import com.ruoyi.system.mapper.SysMaterialWeldingMapper;
 import com.ruoyi.system.domain.SysMaterialWelding;
 import com.ruoyi.system.service.ISysMaterialWeldingService;
 import com.ruoyi.common.exception.ServiceException;
+import org.springframework.transaction.annotation.Transactional;
+import com.ruoyi.common.utils.SecurityUtils;
 
 /**
  * 总成件库存管理Service业务层处理
@@ -146,7 +147,11 @@ public class SysMaterialWeldingServiceImpl implements ISysMaterialWeldingService
 
         // 记录同步结果
         StringBuilder resultMsg = new StringBuilder();
+        // 成功的焊装物料列表
+        List<SysMaterialWelding> sysMaterialWeldingSuccessList = new ArrayList<>();
+        // BOM接口调用计数-成功
         int successCount = 0;
+        // BOM接口调用计数-失败
         int failedCount = 0;
 
         for (SysMaterialWelding welding : materialList) {
@@ -159,7 +164,10 @@ public class SysMaterialWeldingServiceImpl implements ISysMaterialWeldingService
                 // 返回类型需要等接口调通 看到返回值之后更新
                 Map<String, Integer> stampingDetails = WebServiceUtils.getBOMData(welding.getMaterialId());
                 log.info("焊装物料ID: {} 获取BOM明细: {}", welding.getMaterialId(), stampingDetails);
+                int bomSize = stampingDetails.size();
+                int matchErrNum = 0;
 
+                // BOM明细为空
                 if (stampingDetails.isEmpty()) {
                     resultMsg.append("焊装物料ID:").append(welding.getMaterialId()).append("未找到BOM明细\n");
                     failedCount++;
@@ -176,32 +184,43 @@ public class SysMaterialWeldingServiceImpl implements ISysMaterialWeldingService
                     // 判断库存中是否存在该冲压件
                     List<SysMaterialStamping> stampingList = sysMaterialStampingMapper.selectSysMaterialStampingByMatId(stampingId);
                     if (stampingList == null || stampingList.isEmpty()) {
-                        log.info("冲压件ID: {} 不存在，无法扣减库存", stampingId);
+                        log.info("物料ID: {} 不存在，无法扣减库存，该物料很可能不是冲压件", stampingId);
+                        matchErrNum ++;
                     } else {
                         // 执行库存扣减
                         reduceStampingInventoryByBatch(stampingId, reduceAmount);
                         log.info("冲压件ID: {} 扣减数量: {}", stampingId, reduceAmount);
                     }
                 }
-                // 标记为已同步
-                String materialId = welding.getMaterialId();
-                int syncMsg = sysMaterialWeldingMapper.updateWeldingSyncFlag( materialId); // updateSysMaterialWelding
-                if (syncMsg == 1){
-                    log.info("焊装物料ID: {} 同步状态已更新", welding.getMaterialId());
+                // 如果所有BOM明细都未找到对应的冲压件，失败
+                if (matchErrNum == bomSize) {
+                    resultMsg.append("焊装物料ID:").append(welding.getMaterialId()).append("未找到对应的冲压件，报工失败\n");
+                    log.info("焊装物料ID: {} 未找到对应的冲压件，报工失败", welding.getMaterialId());
+                    failedCount++;
+                    continue;
                 } else {
-                    log.info("焊装物料ID: {} 同步状态更新失败", welding.getMaterialId());
+                    // 标记为已同步
+                    String materialId = welding.getMaterialId();
+                    int syncMsg = sysMaterialWeldingMapper.updateWeldingSyncFlag( materialId); // updateSysMaterialWelding
+                    if (syncMsg == 1){
+                        log.info("焊装物料ID: {} 同步状态已更新", welding.getMaterialId());
+                    } else {
+                        log.info("焊装物料ID: {} 同步状态更新失败", welding.getMaterialId());
+                    }
+
+                    successCount++;
+                    sysMaterialWeldingSuccessList.add(welding);
                 }
-
-                successCount++;
-
 
             } catch (Exception e) {
                 resultMsg.append("焊装物料ID:").append(welding.getMaterialId()).append("同步失败:").append(e.getMessage()).append("\n");
                 failedCount++;
-                // 单个物料同步失败，继续处理其他物料
             }
+
         }
-        resultMsg.append("同步完成，成功:").append(successCount).append("条，失败:").append(failedCount).append("条\n");
+        resultMsg.append("报工完成，成功:").append(successCount).append("条，失败:").append(failedCount).append("条\n");
+        // 全部报工执行完成后，进行转序
+        procedingWelding(sysMaterialWeldingSuccessList);
         return resultMsg.toString();
     }
 
@@ -251,6 +270,38 @@ public class SysMaterialWeldingServiceImpl implements ISysMaterialWeldingService
         if (remaining > 0) {
             throw new ServiceException("冲压件库存不足：" + stampingId + " 需扣减" + totalReduce + "，当前可用" + (totalReduce - remaining));
         }
+    }
+
+    /**
+     * 转序：将报工成功的总成物料转移到表sys_material_welding_painting
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void procedingWelding(List<SysMaterialWelding> sysMaterialWeldingSuccessList) {
+         // 判断传入的总成物料列表是否为空或为null，如果是则直接返回，不进行后续操作
+        if (sysMaterialWeldingSuccessList == null || sysMaterialWeldingSuccessList.isEmpty()) {
+            return;
+        }
+        // 创建一个SysMaterialWeldingPainting对象列表，用于存储转序后的总成物料信息
+        List<SysMaterialWeldingPainting> paintingList = new ArrayList<>();
+        for (SysMaterialWelding sysMaterialWelding : sysMaterialWeldingSuccessList) {
+            // 创建一个SysMaterialWeldingPainting对象，用于存储总成物料的转序信息
+            SysMaterialWeldingPainting sysMaterialWeldingPainting = new SysMaterialWeldingPainting();
+            // 设置总成物料编码
+            sysMaterialWeldingPainting.setMaterialId(sysMaterialWelding.getMaterialId());
+            // 设置总成物料名称
+            sysMaterialWeldingPainting.setMaterialName(sysMaterialWelding.getMaterialName());
+            // 设置总成物料数量
+            sysMaterialWeldingPainting.setNum(sysMaterialWelding.getNum());
+            // 设置转序日期
+            sysMaterialWeldingPainting.setProcedingDate(new Date());
+            // 设置操作人
+            sysMaterialWeldingPainting.setOperator(SecurityUtils.getUsername());
+            // 将转序后的总成物料信息添加到列表中
+            paintingList.add(sysMaterialWeldingPainting);
+        }
+        // 将转序后的总成物料信息批量插入到表sys_material_welding_painting中
+        sysMaterialWeldingMapper.batchInsertSysMaterialWeldingPainting(paintingList);
+        log.info("转序成功，已将 {} 条总成物料转序到 sys_material_welding_painting 表", paintingList.size());
     }
 
 }

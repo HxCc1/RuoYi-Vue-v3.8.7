@@ -69,7 +69,6 @@ public class WebServiceUtils {
 
         Service service = new Service();
         try {
-            log.info("进入try...catch...");
             Call call = (Call) service.createCall();
             call.setTargetEndpointAddress(endpoint);
             call.setOperationName(func); // 设置方法名
@@ -82,6 +81,7 @@ public class WebServiceUtils {
 
             // 执行Web服务调用
             Object[] args = params.values().toArray();
+            log.info("调用BOM接口...");
             result = (String) call.invoke(args);
             log.info(endpoint + " - " + func + " -- 调用成功，返回结果: " + result);
         } catch (Exception e) {
@@ -214,7 +214,7 @@ public class WebServiceUtils {
     }
 
     public static void main(String[] args) {
-        String materialId = "455020213"; // 示例物料ID
+        String materialId = "455311654"; // 示例物料ID 455311654  455020213
         Map<String, Integer> bomData = getBOMData(materialId);
         if (bomData != null) {
             for (Map.Entry<String, Integer> entry : bomData.entrySet()) {

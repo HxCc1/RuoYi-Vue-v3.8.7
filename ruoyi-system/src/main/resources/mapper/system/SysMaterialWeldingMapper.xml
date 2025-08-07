@@ -105,4 +105,20 @@
         WHERE  material_id = #{materialId}
     </update>
 
+    <!-- 插入焊接材料 -->
+    <insert id="batchInsertSysMaterialWeldingPainting" parameterType="java.util.List">
+        insert into sys_material_welding_painting
+        (material_id, material_name, num, proceding_date, operator)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (
+                #{item.materialId},
+                #{item.materialName},
+                #{item.num},
+                #{item.procedingDate},
+                #{item.operator}
+            )
+        </foreach>
+    </insert>
+
 </mapper>

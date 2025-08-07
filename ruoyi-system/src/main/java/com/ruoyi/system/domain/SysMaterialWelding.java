@@ -15,6 +15,7 @@ import com.ruoyi.common.core.domain.BaseEntity;
  */
 public class SysMaterialWelding extends BaseEntity
 {
+    // 用于序列化的版本控制，表示该类的序列化版本号为 1L
     private static final long serialVersionUID = 1L;
 
     /** 主键id */

@@ -30,18 +30,15 @@
     <select id="selectSysMaterialStampingList" parameterType="com.ruoyi.system.domain.SysMaterialStamping"
             resultMap="SysMaterialStampingResult">
         <include refid="selectSysMaterialStampingVo"/>
-<!--        <where>-->
-<!--            <if test="materialId != null ">and material_id = #{materialId}</if>-->
-<!--            <if test="materialName != null  and materialName != ''">and material_name like concat('%', #{materialName},-->
-<!--                '%')-->
-<!--            </if>-->
-<!--            <if test="supplierId != null ">and supplier_id = #{supplierId}</if>-->
-<!--            <if test="supplierName != null  and supplierName != ''">and supplier_name like concat('%', #{supplierName},-->
-<!--                '%')-->
-<!--            </if>-->
-<!--            <if test="num != null ">and num = #{num}</if>-->
-<!--            <if test="entryTime != null ">and DATE(entry_time) = DATE(#{entryTime})</if>-->
-<!--        </where>-->
+        <where>
+            <if test="materialId != null ">and material_id = #{materialId}</if>
+            <if test="materialName != null  and materialName != ''">and material_name like concat('%', #{materialName},'%')
+            </if>
+            <if test="supplierId != null ">and supplier_id = #{supplierId}</if>
+            <if test="supplierName != null  and supplierName != ''">and supplier_name like concat('%', #{supplierName},'%')
+            </if>
+            <if test="entryTime != null ">and DATE(entry_time) = DATE(#{entryTime})</if>
+        </where>
         order by material_id, entry_time
     </select>
 
