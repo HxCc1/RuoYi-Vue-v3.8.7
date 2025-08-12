@@ -8,102 +8,116 @@ import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.core.domain.BaseEntity;
 
 /**
- * 总成件库存管理对象 sys_material_welding
+ * 焊装物料库存管理对象 sys_material_welding
  *
  * @author ruoyi
- * @date 2025-06-05
+ * @date 2025-08-12
  */
 public class SysMaterialWelding extends BaseEntity
 {
-    // 用于序列化的版本控制，表示该类的序列化版本号为 1L
     private static final long serialVersionUID = 1L;
 
-    /** 主键id */
+    /** 主键 */
     private Long id;
 
-    /** 物料编码 */
-    @Excel(name = "物料编码")
+    /** 总成件物料编码 */
+    @Excel(name = "总成件物料编码")
     private String materialId;
 
-    /** 物料名称 */
-    @Excel(name = "物料名称")
+    /** 总成件物料名称 */
+    @Excel(name = "总成件物料名称")
     private String materialName;
 
     /** 数量 */
     @Excel(name = "数量")
-    private int num;
+    private Long num;
 
-    /** 入库时间 */
+    /** 转序日期 */
     @JsonFormat(pattern = "yyyy-MM-dd")
-    @Excel(name = "入库时间", width = 30, dateFormat = "yyyy-MM-dd")
-    private Date entryTime;
+    @Excel(name = "转序日期", width = 30, dateFormat = "yyyy-MM-dd")
+    private Date procedingDate;
 
-    /** 备注 */
-    private String remark;
+    /** 报工操作人 */
+    @Excel(name = "报工操作人")
+    private String operator;
 
-    /** 报工状态 */
-    private int syncFlag;
+    /** 创建日期 */
+    private Date createDatetime;
+
+    /** 更新日期 */
+    private Date updateDatetime;
 
     public void setId(Long id)
     {
         this.id = id;
     }
+
     public Long getId()
     {
         return id;
     }
-
     public void setMaterialId(String materialId)
     {
         this.materialId = materialId;
     }
+
     public String getMaterialId()
     {
         return materialId;
     }
-
     public void setMaterialName(String materialName)
     {
         this.materialName = materialName;
     }
+
     public String getMaterialName()
     {
         return materialName;
     }
-
-    public void setNum(int num)
+    public void setNum(Long num)
     {
         this.num = num;
     }
-    public int getNum()
+
+    public Long getNum()
     {
         return num;
     }
-
-    public void setEntryTime(Date entryTime)
+    public void setProcedingDate(Date procedingDate)
     {
-        this.entryTime = entryTime;
+        this.procedingDate = procedingDate;
     }
-    public Date getEntryTime()
+
+    public Date getProcedingDate()
     {
-        return entryTime;
+        return procedingDate;
+    }
+    public void setOperator(String operator)
+    {
+        this.operator = operator;
     }
 
-    @Override
-    public String getRemark() {
-        return remark;
+    public String getOperator()
+    {
+        return operator;
+    }
+    public void setCreateDatetime(Date createDatetime)
+    {
+        this.createDatetime = createDatetime;
     }
 
-    @Override
-    public void setRemark(String remark) {
-        this.remark = remark;
+    public Date getCreateDatetime()
+    {
+        return createDatetime;
+    }
+    public void setUpdateDatetime(Date updateDatetime)
+    {
+        this.updateDatetime = updateDatetime;
     }
 
-    public int getSyncFlag() {
-        return syncFlag;
-    }
-    public void setSyncFlag(int syncFlag) {
-        this.syncFlag = syncFlag;
+    public Date getUpdateDatetime()
+    {
+        return updateDatetime;
     }
 
     @Override
@@ -113,9 +127,10 @@ public class SysMaterialWelding extends BaseEntity
                 .append("materialId", getMaterialId())
                 .append("materialName", getMaterialName())
                 .append("num", getNum())
-                .append("entryTime", getEntryTime())
-                .append("remark", getRemark())
-                .append("syncFlag",getSyncFlag())
+                .append("procedingDate", getProcedingDate())
+                .append("operator", getOperator())
+                .append("createDatetime", getCreateDatetime())
+                .append("updateDatetime", getUpdateDatetime())
                 .toString();
     }
 }

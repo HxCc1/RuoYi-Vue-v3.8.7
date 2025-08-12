@@ -245,7 +245,7 @@ export default {
         // 是否禁用上传
         isUploading: false,
         // 是否更新已经存在的物料数据
-        updateSupport: "",
+        updateSupport: "0",
         // 设置上传的请求头部
         headers: { Authorization: "Bearer " + getToken() },
         // 上传的地址

@@ -5,29 +5,29 @@
 <mapper namespace="com.ruoyi.system.mapper.SysMaterialWeldingMapper">
 
     <resultMap type="com.ruoyi.system.domain.SysMaterialWelding" id="SysMaterialWeldingResult">
-        <result property="id" column="id"/>
-        <result property="materialId" column="material_id"/>
-        <result property="materialName" column="material_name"/>
-        <result property="num" column="num"/>
-        <result property="entryTime" column="entry_time"/>
-        <result property="remark" column="remark"/>
-        <result property="syncFlag" column="sync_flag"/>
+        <result property="id"    column="id"    />
+        <result property="materialId"    column="material_id"    />
+        <result property="materialName"    column="material_name"    />
+        <result property="num"    column="num"    />
+        <result property="procedingDate"    column="proceding_date"    />
+        <result property="operator"    column="operator"    />
+        <result property="createDatetime"    column="create_datetime"    />
+        <result property="updateDatetime"    column="update_datetime"    />
     </resultMap>
 
     <sql id="selectSysMaterialWeldingVo">
-        select id, material_id, material_name, num, entry_time, remark, sync_flag from sys_material_welding
+        select id, material_id, material_name, num, proceding_date, operator, create_datetime, update_datetime from sys_material_welding
     </sql>
 
     <select id="selectSysMaterialWeldingList" parameterType="com.ruoyi.system.domain.SysMaterialWelding" resultMap="SysMaterialWeldingResult">
         <include refid="selectSysMaterialWeldingVo"/>
         <where>
-            <if test="materialId != null ">and material_id = #{materialId}</if>
-            <if test="materialName != null  and materialName != ''">and material_name like concat('%', #{materialName},
-                '%')
-            </if>
-            <if test="entryTime != null ">and DATE(entry_time) = DATE(#{entryTime})</if>
+            <if test="materialId != null  and materialId != ''"> and material_id = #{materialId}</if>
+            <if test="materialName != null  and materialName != ''"> and material_name like concat('%', #{materialName}, '%')</if>
+            <if test="num != null "> and num = #{num}</if>
+            <if test="procedingDate != null "> and proceding_date = #{procedingDate}</if>
+            <if test="operator != null  and operator != ''"> and operator = #{operator}</if>
         </where>
-        order by material_id, entry_time
     </select>
 
     <select id="selectSysMaterialWeldingById" parameterType="Long" resultMap="SysMaterialWeldingResult">
@@ -38,30 +38,35 @@
     <insert id="insertSysMaterialWelding" parameterType="com.ruoyi.system.domain.SysMaterialWelding" useGeneratedKeys="true" keyProperty="id">
         insert into sys_material_welding
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="materialId != null">material_id,</if>
-            <if test="materialName != null and materialName != ''">material_name,</if>
+            <if test="materialId != null and materialId != ''">material_id,</if>
+            <if test="materialName != null">material_name,</if>
             <if test="num != null">num,</if>
-            <if test="entryTime != null">entry_time,</if>
-            <if test="remark != null">remark,</if>
+            <if test="procedingDate != null">proceding_date,</if>
+            <if test="operator != null and operator != ''">operator,</if>
+            <if test="createDatetime != null">create_datetime,</if>
+            <if test="updateDatetime != null">update_datetime,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="materialId != null">#{materialId},</if>
-            <if test="materialName != null and materialName != ''">#{materialName},</if>
+            <if test="materialId != null and materialId != ''">#{materialId},</if>
+            <if test="materialName != null">#{materialName},</if>
             <if test="num != null">#{num},</if>
-            <if test="entryTime != null">#{entryTime},</if>
-            <if test="remark != null">#{remark},</if>
+            <if test="procedingDate != null">#{procedingDate},</if>
+            <if test="operator != null and operator != ''">#{operator},</if>
+            <if test="createDatetime != null">#{createDatetime},</if>
+            <if test="updateDatetime != null">#{updateDatetime},</if>
         </trim>
     </insert>
 
     <update id="updateSysMaterialWelding" parameterType="com.ruoyi.system.domain.SysMaterialWelding">
         update sys_material_welding
         <trim prefix="SET" suffixOverrides=",">
-            <if test="materialId != null">material_id = #{materialId},</if>
-            <if test="materialName != null and materialName != ''">material_name = #{materialName},</if>
+            <if test="materialId != null and materialId != ''">material_id = #{materialId},</if>
+            <if test="materialName != null">material_name = #{materialName},</if>
             <if test="num != null">num = #{num},</if>
-            <if test="entryTime != null">entry_time = #{entryTime},</if>
-            <if test="remark != null">remark = #{remark},</if>
-            <if test="syncFlag != null">syncFlag = #{syncFlag}</if>
+            <if test="procedingDate != null">proceding_date = #{procedingDate},</if>
+            <if test="operator != null and operator != ''">operator = #{operator},</if>
+            <if test="createDatetime != null">create_datetime = #{createDatetime},</if>
+            <if test="updateDatetime != null">update_datetime = #{updateDatetime},</if>
         </trim>
         where id = #{id}
     </update>
@@ -76,49 +81,4 @@
             #{id}
         </foreach>
     </delete>
-
-    <update id="syncStampingByMateriaId" parameterType="com.ruoyi.system.domain.SysMaterialWelding">
-        update sys_material_welding
-        <trim prefix="SET" suffixOverrides=",">
-            <if test="materialId != null">material_id = #{materialId},</if>
-            <if test="materialName != null and materialName != ''">material_name = #{materialName},</if>
-            <if test="num != null">num = #{num},</if>
-            <if test="entryTime != null">entry_time = #{entryTime},</if>
-            <if test="remark != null">remark = #{remark},</if>
-        </trim>
-        where id = #{id}
-    </update>
-
-    <select id="selectSyncedWeldingIds" parameterType="java.util.List" resultType="java.lang.Long">
-        select id
-        from sys_material_welding
-        where sync_flag=1 and id in
-        <foreach item="id" collection="list" open="(" separator="," close=")">
-            #{id}
-        </foreach>
-    </select>
-
-    <!-- 设置同步状态为已同步 -->
-    <update id="updateWeldingSyncFlag">
-        UPDATE sys_material_welding
-        SET sync_flag = 1
-        WHERE  material_id = #{materialId}
-    </update>
-
-    <!-- 插入焊接材料 -->
-    <insert id="batchInsertSysMaterialWeldingPainting" parameterType="java.util.List">
-        insert into sys_material_welding_painting
-        (material_id, material_name, num, proceding_date, operator)
-        values
-        <foreach collection="list" item="item" separator=",">
-            (
-                #{item.materialId},
-                #{item.materialName},
-                #{item.num},
-                #{item.procedingDate},
-                #{item.operator}
-            )
-        </foreach>
-    </insert>
-
 </mapper>
