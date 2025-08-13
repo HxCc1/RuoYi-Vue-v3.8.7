@@ -51,3 +51,12 @@ export function transferWeldingManage(data) {
     data: data
   })
 }
+
+// Excel转序扣减库存
+export function transferByExcel(data) {
+  return request({
+    url: '/system/weldingManage/transferByExcel',
+    method: 'post',
+    data: data
+  })
+}

@@ -1,5 +1,6 @@
 package com.ruoyi.system.service.impl;
 
+import java.util.Comparator;
 import java.util.List;
 
 import com.ruoyi.common.exception.ServiceException;
@@ -9,6 +10,7 @@ import com.ruoyi.system.mapper.SysMaterialWeldingMapper;
 import com.ruoyi.system.domain.SysMaterialWelding;
 import com.ruoyi.system.service.ISysMaterialWeldingService;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 /**
  * 焊装物料库存管理Service业务层处理
@@ -127,4 +129,65 @@ public class SysMaterialWeldingServiceImpl implements ISysMaterialWeldingService
         }
         return count;
     }
+
+    @Override
+    @Transactional
+    public int transferByExcel(List<SysMaterialWelding> excelData) {
+        int totalCount = 0;
+
+        for (SysMaterialWelding excelItem : excelData) {
+            String materialId = excelItem.getMaterialId();
+            Long needReduce = excelItem.getReduceNum();
+            Long remaining = needReduce; // 剩余需要扣减的数量
+
+            // 1. 查询该物料的所有批次，按日期升序（旧批次优先）
+            SysMaterialWelding query = new SysMaterialWelding();
+            query.setMaterialId(materialId);
+            List<SysMaterialWelding> batches = sysMaterialWeldingMapper.selectSysMaterialWeldingList(query);
+
+            // 按转序日期升序排序（确保旧批次先扣减）
+            batches.sort(Comparator.comparing(SysMaterialWelding::getProcedingDate));
+
+            if (CollectionUtils.isEmpty(batches)) {
+                throw new ServiceException("物料不存在：" + materialId);
+            }
+
+            // 2. 检查总库存是否充足
+            Long totalStock = batches.stream().mapToLong(SysMaterialWelding::getNum).sum();
+            if (totalStock < needReduce) {
+                throw new ServiceException("物料总库存不足：" + materialId + "，当前总库存：" + totalStock + "，请求扣减：" + needReduce);
+            }
+
+            // 3. 按批次扣减
+            for (SysMaterialWelding batch : batches) {
+                if (remaining <= 0) {
+                    break; // 已扣减完成
+                }
+
+                Long batchNum = batch.getNum();
+                if (batchNum <= 0) {
+                    continue; // 跳过空批次
+                }
+
+                Long reduceThisBatch = Math.min(remaining, batchNum);
+                Long newNum = batchNum - reduceThisBatch;
+
+                // 更新批次库存
+                SysMaterialWelding updateEntity = new SysMaterialWelding();
+                updateEntity.setId(batch.getId());
+                updateEntity.setNum(newNum);
+                sysMaterialWeldingMapper.updateSysMaterialWelding(updateEntity);
+
+                remaining -= reduceThisBatch;
+                totalCount++;
+            }
+
+            if (remaining > 0) {
+                throw new ServiceException("扣减过程中出现异常，物料：" + materialId + " 仍有 " + remaining + " 未扣减");
+            }
+        }
+
+        return totalCount;
+    }
+
 }

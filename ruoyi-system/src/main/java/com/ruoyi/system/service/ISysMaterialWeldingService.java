@@ -65,4 +65,11 @@ public interface ISysMaterialWeldingService
      * @return 结果
      */
     public int transferStock(List<SysMaterialWelding> list);
+
+    /**
+     * 通过Excel转序扣减库存（按批次优先扣减旧批次）
+     * @param excelData Excel中的物料数据
+     * @return 结果
+     */
+    public int transferByExcel(List<SysMaterialWelding> excelData);
 }

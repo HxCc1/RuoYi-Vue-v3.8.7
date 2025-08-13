@@ -2,6 +2,8 @@ package com.ruoyi.system.controller;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+
+import com.ruoyi.common.utils.StringUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
@@ -115,5 +117,25 @@ public class SysMaterialWeldingController extends BaseController
         }
         return toAjax(sysMaterialWeldingService.transferStock(list));
     }
+
+    /**
+     * 通过Excel转序涂装扣减库存
+     */
+    @PreAuthorize("@ss.hasPermi('system:weldingManage:transfer')")
+    @Log(title = "焊装物料库存管理", businessType = BusinessType.UPDATE)
+    @PostMapping("/transferByExcel")
+    public AjaxResult transferByExcel(@RequestBody List<SysMaterialWelding> excelData) {
+        if (CollectionUtils.isEmpty(excelData)) {
+            return AjaxResult.error("Excel数据不能为空");
+        }
+        // 校验Excel数据格式
+        for (SysMaterialWelding data : excelData) {
+            if (StringUtils.isBlank(data.getMaterialId()) || data.getReduceNum() == null || data.getReduceNum() <= 0) {
+                return AjaxResult.error("物料编码不能为空且扣减数量必须大于0");
+            }
+        }
+        return toAjax(sysMaterialWeldingService.transferByExcel(excelData));
+    }
+
 
 }

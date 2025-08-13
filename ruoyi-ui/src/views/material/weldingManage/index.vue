@@ -104,6 +104,18 @@
         >转序涂装</el-button>
       </el-col>
 
+      <!-- Excel转序 -->
+      <el-col :span="1.5">
+        <el-button
+          type="primary"
+          plain
+          icon="el-icon-upload"
+          size="mini"
+          @click="handleExcelTransfer"
+          v-hasPermi="['system:weldingManage:transfer']"
+        >Excel转序</el-button>
+      </el-col>
+
       <!-- 转序涂装对话框 -->
       <el-dialog :title="transferTitle" :visible.sync="transferOpen" width="700px" append-to-body>
         <el-table :data="transferList" border>
@@ -126,6 +138,48 @@
         <div slot="footer" class="dialog-footer">
           <el-button @click="transferCancel">取 消</el-button>
           <el-button type="primary" @click="confirmTransfer">确 定</el-button>
+        </div>
+      </el-dialog>
+
+      <!-- Excel转序对话框 -->
+      <el-dialog :title="excelTransferTitle" :visible.sync="excelTransferOpen" width="600px" append-to-body>
+        <el-upload
+          class="upload-demo"
+          action="#"
+          :auto-upload="false"
+          :on-change="handleFileChange"
+          :file-list="fileList"
+          accept=".xlsx,.xls"
+          :limit="1"
+        >
+          <el-button size="mini" type="primary">选择Excel文件</el-button>
+          <div slot="tip" class="el-upload__tip">
+            请上传.xlsx或.xls格式的文件，内容需包含"物料编码"和"数量"两列
+          </div>
+        </el-upload>
+
+        <!-- 预览上传的数据 -->
+        <el-table
+          v-if="excelData.length > 0"
+          :data="excelData"
+          border
+          style="margin-top: 15px; max-height: 300px; overflow-y: auto;"
+        >
+          <el-table-column label="物料编码" prop="materialId" width="200" />
+          <el-table-column label="扣减数量" prop="reduceNum" width="150" />
+          <el-table-column label="状态" prop="status" width="150">
+            <template slot-scope="scope">
+        <span :class="scope.row.status === '有效' ? 'el-tag el-tag-success' : 'el-tag el-tag-danger'">
+          {{ scope.row.status }}
+        </span>
+            </template>
+          </el-table-column>
+          <el-table-column label="备注" prop="remark" />
+        </el-table>
+
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="excelTransferCancel">取 消</el-button>
+          <el-button type="primary" @click="confirmExcelTransfer" :loading="excelUploadLoading">确 定</el-button>
         </div>
       </el-dialog>
 
@@ -205,7 +259,7 @@
 </template>
 
 <script>
-import { listWeldingManage, getWeldingManage, delWeldingManage, addWeldingManage, updateWeldingManage, transferWeldingManage } from "@/api/material/weldingManage";
+import { listWeldingManage, getWeldingManage, delWeldingManage, addWeldingManage, updateWeldingManage, transferWeldingManage,transferByExcel } from "@/api/material/weldingManage";
 
 export default {
   name: "WeldingManage",
@@ -260,6 +314,13 @@ export default {
       transferOpen: false,
       transferTitle: "转序涂装",
       transferList: [], // 转序列表
+
+      // Excel转序相关
+      excelTransferOpen: false,
+      excelTransferTitle: "Excel转序涂装",
+      fileList: [],
+      excelData: [], // 解析后的Excel数据
+      excelUploadLoading: false,
     };
   },
   created() {
@@ -410,6 +471,85 @@ export default {
         this.$modal.msgError("转序失败");
       });
     },
+
+    /** 打开Excel转序对话框 */
+    handleExcelTransfer() {
+      this.excelTransferOpen = true;
+      this.fileList = [];
+      this.excelData = [];
+    },
+
+    /** 处理文件选择 */
+    handleFileChange(file, fileList) {
+      this.fileList = [file]; // 只保留最新选择的文件
+      this.parseExcel(file.raw);
+    },
+
+    /** 解析Excel文件 */
+    parseExcel(file) {
+      import('xlsx').then(XLSX => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const firstSheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[firstSheetName];
+          const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+          // 校验并转换数据格式
+          this.excelData = jsonData.map(item => {
+            // 适配不同表头可能的命名（物料编码/物料ID，数量/扣减数量）
+            const materialId = item['物料编码'] || item['物料ID'] || '';
+            const reduceNum = Number(item['数量'] || item['扣减数量'] || 0);
+            const status = materialId && reduceNum > 0 ? '有效' : '无效';
+            const remark = !materialId ? '缺少物料编码' : (reduceNum <= 0 ? '扣减数量必须大于0' : '');
+
+            return {
+              materialId,
+              reduceNum,
+              status,
+              remark
+            };
+          });
+        };
+        reader.readAsArrayBuffer(file);
+      });
+    },
+
+    /** 取消Excel转序 */
+    excelTransferCancel() {
+      this.excelTransferOpen = false;
+      this.fileList = [];
+      this.excelData = [];
+    },
+
+    /** 确认Excel转序 */
+    confirmExcelTransfer() {
+      // 校验数据有效性
+      const invalidData = this.excelData.filter(item => item.status !== '有效');
+      if (invalidData.length > 0) {
+        this.$message.error('存在无效数据，请检查Excel内容');
+        return;
+      }
+
+      if (this.excelData.length === 0) {
+        this.$message.warning('请先上传并解析Excel文件');
+        return;
+      }
+
+      this.excelUploadLoading = true;
+      // 调用后端接口
+      transferByExcel(this.excelData).then(response => {
+        this.$modal.msgSuccess('Excel转序成功');
+        this.excelTransferOpen = false;
+        this.getList(); // 刷新列表
+      }).catch(() => {
+        this.$modal.msgError('Excel转序失败');
+      }).finally(() => {
+        this.excelUploadLoading = false;
+      });
+    }
+
   }
 };
 </script>
