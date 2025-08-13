@@ -47,6 +47,18 @@ public class SysMaterialWelding extends BaseEntity
     /** 更新日期 */
     private Date updateDatetime;
 
+    // 新增字段：接收前端传递的扣减数量
+    private Long reduceNum;
+
+    // getter和setter方法
+    public Long getReduceNum() {
+        return reduceNum;
+    }
+
+    public void setReduceNum(Long reduceNum) {
+        this.reduceNum = reduceNum;
+    }
+
     public void setId(Long id)
     {
         this.id = id;

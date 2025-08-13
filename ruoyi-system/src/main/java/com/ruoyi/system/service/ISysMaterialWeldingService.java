@@ -58,4 +58,11 @@ public interface ISysMaterialWeldingService
      * @return 结果
      */
     public int deleteSysMaterialWeldingById(Long id);
+
+    /**
+     * 转序涂装扣减库存
+     * @param list 转序物料列表
+     * @return 结果
+     */
+    public int transferStock(List<SysMaterialWelding> list);
 }

@@ -42,3 +42,12 @@ export function delWeldingManage(id) {
     method: 'delete'
   })
 }
+
+// 转序涂装扣减库存
+export function transferWeldingManage(data) {
+  return request({
+    url: '/system/weldingManage/transfer',
+    method: 'post',
+    data: data
+  })
+}

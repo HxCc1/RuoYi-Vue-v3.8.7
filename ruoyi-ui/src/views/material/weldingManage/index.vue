@@ -50,7 +50,7 @@
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button
-          type="primary"
+          type="info"
           plain
           icon="el-icon-plus"
           size="mini"
@@ -90,6 +90,45 @@
           v-hasPermi="['system:weldingManage:export']"
         >导出</el-button>
       </el-col>
+
+      <!-- 转序涂装 -->
+      <el-col :span="1.5">
+        <el-button
+          type="primary"
+          plain
+          icon="el-icon-transfer"
+          size="mini"
+          :disabled="multiple"
+          @click="handleTransfer"
+          v-hasPermi="['system:weldingManage:transfer']"
+        >转序涂装</el-button>
+      </el-col>
+
+      <!-- 转序涂装对话框 -->
+      <el-dialog :title="transferTitle" :visible.sync="transferOpen" width="700px" append-to-body>
+        <el-table :data="transferList" border>
+          <el-table-column label="总成件物料编码" align="center" prop="materialId" width="150" />
+          <el-table-column label="总成件物料名称" align="center" prop="materialName" width="300" />
+          <el-table-column label="当前库存" align="center" prop="num" width="90" />
+          <el-table-column label="扣减数量" align="center">
+            <template slot-scope="scope">
+              <el-input
+                v-model.number="scope.row.reduceNum"
+                type="number"
+                min="1"
+                :max="scope.row.num"
+                @input="handleReduceNumChange(scope.row)"
+                placeholder="请输入扣减数量"
+              />
+            </template>
+          </el-table-column>
+        </el-table>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="transferCancel">取 消</el-button>
+          <el-button type="primary" @click="confirmTransfer">确 定</el-button>
+        </div>
+      </el-dialog>
+
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
@@ -99,7 +138,7 @@
       <el-table-column label="总成件物料编码" align="center" prop="materialId" />
       <el-table-column label="总成件物料名称" align="center" prop="materialName" />
       <el-table-column label="数量" align="center" prop="num" />
-      <el-table-column label="转序日期" align="center" prop="procedingDate" width="180">
+      <el-table-column label="日期" align="center" prop="procedingDate" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.procedingDate, '{y}-{m}-{d}') }}</span>
         </template>
@@ -166,7 +205,7 @@
 </template>
 
 <script>
-import { listWeldingManage, getWeldingManage, delWeldingManage, addWeldingManage, updateWeldingManage } from "@/api/material/weldingManage";
+import { listWeldingManage, getWeldingManage, delWeldingManage, addWeldingManage, updateWeldingManage, transferWeldingManage } from "@/api/material/weldingManage";
 
 export default {
   name: "WeldingManage",
@@ -216,7 +255,11 @@ export default {
         operator: [
           { required: true, message: "报工操作人不能为空", trigger: "blur" }
         ],
-      }
+      },
+      // 转序相关
+      transferOpen: false,
+      transferTitle: "转序涂装",
+      transferList: [], // 转序列表
     };
   },
   created() {
@@ -318,7 +361,55 @@ export default {
       this.download('system/weldingManage/export', {
         ...this.queryParams
       }, `weldingManage_${new Date().getTime()}.xlsx`)
-    }
+    },
+    /** 转序涂装按钮操作 */
+    handleTransfer() {
+      // 深拷贝选中的行数据
+      this.transferList = this.ids.map(id => {
+        const row = this.weldingManageList.find(item => item.id === id);
+        return { ...row, reduceNum: 1 }; // 默认扣减1
+      });
+      this.transferOpen = true;
+    },
+
+    /** 扣减数量变化校验 */
+    handleReduceNumChange(row) {
+      if (row.reduceNum > row.num) {
+        this.$message.warning(`扣减数量不能超过当前库存(${row.num})`);
+        row.reduceNum = row.num;
+      }
+      if (row.reduceNum < 1) {
+        this.$message.warning("扣减数量不能小于1");
+        row.reduceNum = 1;
+      }
+    },
+
+    /** 取消转序 */
+    transferCancel() {
+      this.transferOpen = false;
+      this.transferList = [];
+    },
+
+    /** 确认转序 */
+    confirmTransfer() {
+      // 校验所有扣减数量
+      const invalid = this.transferList.some(row =>
+        !row.reduceNum || row.reduceNum < 1 || row.reduceNum > row.num
+      );
+      if (invalid) {
+        this.$message.error("请检查扣减数量是否正确");
+        return;
+      }
+
+      // 调用转序接口
+      transferWeldingManage(this.transferList).then(response => {
+        this.$modal.msgSuccess("转序成功");
+        this.transferOpen = false;
+        this.getList(); // 刷新列表
+      }).catch(() => {
+        this.$modal.msgError("转序失败");
+      });
+    },
   }
 };
 </script>

@@ -4,6 +4,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -101,4 +102,18 @@ public class SysMaterialWeldingController extends BaseController
     {
         return toAjax(sysMaterialWeldingService.deleteSysMaterialWeldingByIds(ids));
     }
+
+    /**
+     * 转序涂装扣减库存
+     */
+    @PreAuthorize("@ss.hasPermi('system:weldingManage:transfer')")
+    @Log(title = "焊装物料库存管理", businessType = BusinessType.UPDATE)
+    @PostMapping("/transfer")
+    public AjaxResult transfer(@RequestBody List<SysMaterialWelding> list) {
+        if (CollectionUtils.isEmpty(list)) {
+            return AjaxResult.error("转序数据不能为空");
+        }
+        return toAjax(sysMaterialWeldingService.transferStock(list));
+    }
+
 }
